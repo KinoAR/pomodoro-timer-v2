@@ -9,9 +9,7 @@ type state = {
 };
 
 type action = 
-| ClickPomodoro
-| ClickShortBreak
-| ClickLongBreak;
+| Click(string);
 
 type timerButton = {
   name:string,
@@ -22,9 +20,12 @@ type timerButton = {
 let make = () => {
   let (state, dispatch) = React.useReducer((state, action) => 
   switch(action) {
-    | ClickPomodoro => {...state, pomodoroState: Pomodoro}
-    | ClickShortBreak => {...state, pomodoroState: ShortBreak}
-    | ClickLongBreak => {...state, pomodoroState: LongBreak}
+    | Click(actionName) => switch(actionName) {
+     | "pomodoro" => {...state, pomodoroState: Pomodoro}
+     | "shortbreak" => {...state, pomodoroState: ShortBreak}
+     | "longbreak" => {...state, pomodoroState: Pomodoro}
+     | _ => state
+    } 
   }, {running:false, pomodoroState: Pomodoro})
   let commands = [];
 

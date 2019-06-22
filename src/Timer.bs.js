@@ -5,23 +5,20 @@ var React = require("react");
 
 function Timer(Props) {
   React.useReducer((function (state, action) {
-          switch (action) {
-            case 0 : 
+          switch (action[0]) {
+            case "longbreak" : 
+            case "pomodoro" : 
                 return /* record */[
                         /* running */state[/* running */0],
                         /* pomodoroState : Pomodoro */0
                       ];
-            case 1 : 
+            case "shortbreak" : 
                 return /* record */[
                         /* running */state[/* running */0],
                         /* pomodoroState : ShortBreak */1
                       ];
-            case 2 : 
-                return /* record */[
-                        /* running */state[/* running */0],
-                        /* pomodoroState : LongBreak */2
-                      ];
-            
+            default:
+              return state;
           }
         }), /* record */[
         /* running */false,
