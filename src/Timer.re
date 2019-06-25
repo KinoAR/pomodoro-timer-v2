@@ -6,11 +6,14 @@ type pomodoroState =
 type state = {
   running:bool,
   timer:int,
+  initialTime:int,
   pomodoroState: pomodoroState
 };
 
 type action = 
-| Click(string);
+| Click(string)
+| Tick
+| Reset;
 
 type command = {
   name:string,
@@ -20,38 +23,73 @@ type command = {
 type timerButton = {
   name:string,
   className:string,
+  fn: unit => unit
 };
+//Has to be outside of the component to prevent it 
+//from being reinitialized on rerender
+let intervalIdRef = ref(None);
 
 [@react.component]
 let make = () => {
   let (state, dispatch) = React.useReducer((state, action) => 
   switch(action) {
     | Click(actionName) => switch(actionName) {
-     | "pomodoro" => {...state, pomodoroState: Pomodoro}
-     | "shortbreak" => {...state, pomodoroState: ShortBreak}
-     | "longbreak" => {...state, pomodoroState: Pomodoro}
+     | "pomodoro" => {...state, pomodoroState: Pomodoro, timer: 1500, initialTime: 1500}
+     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: 300, initialTime: 900}
+     | "longbreak" => {...state, pomodoroState: LongBreak, timer: 900, initialTime: 900}
      | _ => state
-    } 
-  }, {running:false, timer:300, pomodoroState: Pomodoro})
+    }
+    | Tick => {...state, timer: state.timer  - 1}
+    | Reset => {...state, timer: state.initialTime}
+  }, {running:false, timer:300, initialTime: 300, pomodoroState: Pomodoro})
+  
+  let startTimer = () => {
+    switch(intervalIdRef^) {
+      | Some(_) => ()
+      | None => {
+        let intervalId = Js.Global.setInterval(() => dispatch(Tick), 1000);
+        intervalIdRef := Some(intervalId);
+      }
+    };
+  };
+
+  let stopTimer = () => {
+    switch(intervalIdRef^) {
+      | Some(intervalID) => Js.Global.clearInterval(intervalID)
+      | None => ()
+    };
+  };
+
+  let resetTimer = () => {
+    stopTimer();
+    dispatch(Reset);
+  }
+
   let commands = [
     {name:"pomodoro", uiName: "Pomodoro"},
-    {name:"shortBreak", uiName: "Short Break"}, 
+    {name:"shortbreak", uiName: "Short Break"}, 
     {name: "longbreak", uiName: "Long Break"}
   ];
+
+  let timerButtons = [
+    {name: "Start", className: "btn-success", fn: startTimer},
+    {name: "Stop", className: "btn-danger", fn: stopTimer},
+    {name: "Reset", className: "btn-secondary", fn:resetTimer},
+  ];
+
+
 
   let convertTimeToString = (time) => {
     let minutes = time / 60;
     let seconds = time mod 60;
     let strSeconds = seconds |> string_of_int;
+    let strMinutes = minutes |> string_of_int;
+    let displayMinutes = String.length(strMinutes) < 2 ? "0" ++ strMinutes : strMinutes;
     let displaySeconds = String.length(strSeconds) < 2 ? strSeconds ++ "0" : strSeconds;
-    {j|$minutes:$displaySeconds|j};
+    {j|$displayMinutes:$displaySeconds|j};
   }
 
-  let timerButtons = [
-    {name: "Start", className:"btn-success"},
-    {name: "Stop", className: "btn-danger"},
-    {name: "Reset", className: "btn-secondary"}
-  ];
+  
   let listToReactArray = (list) => list |> Array.of_list |> ReasonReact.array;
 
   <div className="row">
@@ -60,7 +98,7 @@ let make = () => {
           <div className="btn-group">
           {
             List.mapi((index, command:command) => {
-              <button  key={string_of_int(index)} className="btn btn-primary">
+              <button onClick={(_) => dispatch(Click(command.name))} key={string_of_int(index)} className="btn btn-primary">
               {ReasonReact.string(command.uiName)}
               </button>;
             }, commands) |> listToReactArray;
@@ -77,7 +115,7 @@ let make = () => {
             {
               List.mapi((index, button: timerButton) => {
                 let className = button.className;
-                <button  key={string_of_int(index)} className={j|btn $className|j}>
+                <button onClick={(_) => button.fn()}  key={string_of_int(index)} className={j|btn $className|j}>
                 {ReasonReact.string(button.name)}
                 </button>
               }, timerButtons) |> listToReactArray;
