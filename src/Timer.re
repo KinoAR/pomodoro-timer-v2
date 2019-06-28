@@ -3,15 +3,23 @@ type pomodoroState =
 | ShortBreak
 | LongBreak;
 
+type task = {
+  name: string,
+  pomodori: int,
+};
+
 type state = {
   running:bool,
   timer:int,
   initialTime:int,
-  pomodoroState: pomodoroState
+  pomodoroState: pomodoroState,
+  currentTask:task,
+  tasks: list(task)
 };
 
 type action = 
 | Click(string)
+| ClickTask(int)
 | Tick
 | Reset;
 
@@ -25,6 +33,8 @@ type timerButton = {
   className:string,
   fn: unit => unit
 };
+
+
 //Has to be outside of the component to prevent it 
 //from being reinitialized on rerender
 let intervalIdRef = ref(None);
@@ -39,9 +49,10 @@ let make = () => {
      | "longbreak" => {...state, pomodoroState: LongBreak, timer: 900, initialTime: 900}
      | _ => state
     }
+    | ClickTask(taskIndex) => {...state, currentTask: List.nth(state.tasks, taskIndex)}
     | Tick => {...state, timer: state.timer  - 1}
     | Reset => {...state, timer: state.initialTime}
-  }, {running:false, timer:300, initialTime: 300, pomodoroState: Pomodoro})
+  }, {running:false, timer:300, initialTime: 300, pomodoroState: Pomodoro, tasks: [], currentTask:{name:"", pomodori:0}})
   
   let startTimer = () => {
     switch(intervalIdRef^) {
@@ -89,7 +100,7 @@ let make = () => {
     {j|$displayMinutes:$displaySeconds|j};
   }
 
-  
+  let tasks = state.tasks;
   let listToReactArray = (list) => list |> Array.of_list |> ReasonReact.array;
 
   <div className="row">
@@ -122,6 +133,52 @@ let make = () => {
             }
           </div>
         </div>
+    </div>
+    <br/>
+    <div className="col-12 text-center">
+      <h2> {ReasonReact.string("Task View")}</h2>
+      <div className="row">
+        <div className="col-12">
+        {
+          String.length(state.currentTask.name) > 0 ?
+          (<div>
+            <h4> {ReasonReact.string("Current Task")} </h4>
+            <div className="row text-center">
+              <div className="offset-4 col-4 text-center">
+                <div className="card">
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      {ReasonReact.string(state.currentTask.name)}
+                    </h5>
+                    <a href="" className="btn btn-outline-primary">
+                      {ReasonReact.string("Done")}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>) : ReasonReact.null
+        } 
+        </div>
+        <div className="col-12">
+          <h4> {ReasonReact.string("Tasks")} </h4>
+          <div className="row">
+            <div className="col-12">
+              <ul className="list-group">
+                {
+                  List.mapi((index, task:task) => {
+                    let taskName = task.name;
+                    let pomodoriStr = task.pomodori |> string_of_int;
+                    <li onClick={(_) => dispatch(ClickTask(index))} key={string_of_int(index)} className="list-group-item">
+                      {ReasonReact.string({j|$taskName : $pomodoriStr|j})}
+                    </li>;
+                  }, tasks) |> listToReactArray;
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 };

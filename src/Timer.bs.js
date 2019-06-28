@@ -3,6 +3,7 @@
 
 var List = require("bs-platform/lib/js/list.js");
 var $$Array = require("bs-platform/lib/js/array.js");
+var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
@@ -12,21 +13,34 @@ var intervalIdRef = /* record */[/* contents */undefined];
 function Timer(Props) {
   var match = React.useReducer((function (state, action) {
           if (typeof action === "number") {
-            if (action !== 0) {
-              return /* record */[
-                      /* running */state[/* running */0],
-                      /* timer */state[/* initialTime */2],
-                      /* initialTime */state[/* initialTime */2],
-                      /* pomodoroState */state[/* pomodoroState */3]
-                    ];
-            } else {
+            if (action === 0) {
               return /* record */[
                       /* running */state[/* running */0],
                       /* timer */state[/* timer */1] - 1 | 0,
                       /* initialTime */state[/* initialTime */2],
-                      /* pomodoroState */state[/* pomodoroState */3]
+                      /* pomodoroState */state[/* pomodoroState */3],
+                      /* currentTask */state[/* currentTask */4],
+                      /* tasks */state[/* tasks */5]
+                    ];
+            } else {
+              return /* record */[
+                      /* running */state[/* running */0],
+                      /* timer */state[/* initialTime */2],
+                      /* initialTime */state[/* initialTime */2],
+                      /* pomodoroState */state[/* pomodoroState */3],
+                      /* currentTask */state[/* currentTask */4],
+                      /* tasks */state[/* tasks */5]
                     ];
             }
+          } else if (action.tag) {
+            return /* record */[
+                    /* running */state[/* running */0],
+                    /* timer */state[/* timer */1],
+                    /* initialTime */state[/* initialTime */2],
+                    /* pomodoroState */state[/* pomodoroState */3],
+                    /* currentTask */List.nth(state[/* tasks */5], action[0]),
+                    /* tasks */state[/* tasks */5]
+                  ];
           } else {
             switch (action[0]) {
               case "longbreak" : 
@@ -34,21 +48,27 @@ function Timer(Props) {
                           /* running */state[/* running */0],
                           /* timer */900,
                           /* initialTime */900,
-                          /* pomodoroState : LongBreak */2
+                          /* pomodoroState : LongBreak */2,
+                          /* currentTask */state[/* currentTask */4],
+                          /* tasks */state[/* tasks */5]
                         ];
               case "pomodoro" : 
                   return /* record */[
                           /* running */state[/* running */0],
                           /* timer */1500,
                           /* initialTime */1500,
-                          /* pomodoroState : Pomodoro */0
+                          /* pomodoroState : Pomodoro */0,
+                          /* currentTask */state[/* currentTask */4],
+                          /* tasks */state[/* tasks */5]
                         ];
               case "shortbreak" : 
                   return /* record */[
                           /* running */state[/* running */0],
                           /* timer */300,
                           /* initialTime */900,
-                          /* pomodoroState : ShortBreak */1
+                          /* pomodoroState : ShortBreak */1,
+                          /* currentTask */state[/* currentTask */4],
+                          /* tasks */state[/* tasks */5]
                         ];
               default:
                 return state;
@@ -58,9 +78,15 @@ function Timer(Props) {
         /* running */false,
         /* timer */300,
         /* initialTime */300,
-        /* pomodoroState : Pomodoro */0
+        /* pomodoroState : Pomodoro */0,
+        /* currentTask : record */[
+          /* name */"",
+          /* pomodori */0
+        ],
+        /* tasks : [] */0
       ]);
   var dispatch = match[1];
+  var state = match[0];
   var startTimer = function (param) {
     var match = intervalIdRef[0];
     if (match !== undefined) {
@@ -121,6 +147,8 @@ function Timer(Props) {
     var displaySeconds = match$1 ? strSeconds + "0" : strSeconds;
     return "" + (String(displayMinutes) + (":" + (String(displaySeconds) + "")));
   };
+  var tasks = state[/* tasks */5];
+  var match$1 = state[/* currentTask */4][/* name */0].length !== 0;
   return React.createElement("div", {
               className: "row"
             }, React.createElement("div", {
@@ -134,7 +162,7 @@ function Timer(Props) {
                                                 key: String(index),
                                                 className: "btn btn-primary",
                                                 onClick: (function (param) {
-                                                    return Curry._1(dispatch, /* Click */[command[/* name */0]]);
+                                                    return Curry._1(dispatch, /* Click */Block.__(0, [command[/* name */0]]));
                                                   })
                                               }, command[/* uiName */1]);
                                   }), /* :: */[
@@ -159,7 +187,7 @@ function Timer(Props) {
                       className: "col-12 text-center"
                     }, React.createElement("h1", {
                           className: "pomodoro-timer"
-                        }, convertTimeToString(match[0][/* timer */1]))), React.createElement("div", {
+                        }, convertTimeToString(state[/* timer */1]))), React.createElement("div", {
                       className: "col-12 text-center"
                     }, React.createElement("div", {
                           className: "btn-group"
@@ -172,7 +200,44 @@ function Timer(Props) {
                                                     return Curry._1(button[/* fn */2], /* () */0);
                                                   })
                                               }, button[/* name */0]);
-                                  }), timerButtons))))));
+                                  }), timerButtons))))), React.createElement("br", undefined), React.createElement("div", {
+                  className: "col-12 text-center"
+                }, React.createElement("h2", undefined, "Task View"), React.createElement("div", {
+                      className: "row"
+                    }, React.createElement("div", {
+                          className: "col-12"
+                        }, match$1 ? React.createElement("div", undefined, React.createElement("h4", undefined, "Current Task"), React.createElement("div", {
+                                    className: "row text-center"
+                                  }, React.createElement("div", {
+                                        className: "offset-4 col-4 text-center"
+                                      }, React.createElement("div", {
+                                            className: "card"
+                                          }, React.createElement("div", {
+                                                className: "card-body"
+                                              }, React.createElement("h5", {
+                                                    className: "card-title"
+                                                  }, state[/* currentTask */4][/* name */0]), React.createElement("a", {
+                                                    className: "btn btn-outline-primary",
+                                                    href: ""
+                                                  }, "Done")))))) : null), React.createElement("div", {
+                          className: "col-12"
+                        }, React.createElement("h4", undefined, "Tasks"), React.createElement("div", {
+                              className: "row"
+                            }, React.createElement("div", {
+                                  className: "col-12"
+                                }, React.createElement("ul", {
+                                      className: "list-group"
+                                    }, $$Array.of_list(List.mapi((function (index, task) {
+                                                var taskName = task[/* name */0];
+                                                var pomodoriStr = String(task[/* pomodori */1]);
+                                                return React.createElement("li", {
+                                                            key: String(index),
+                                                            className: "list-group-item",
+                                                            onClick: (function (param) {
+                                                                return Curry._1(dispatch, /* ClickTask */Block.__(1, [index]));
+                                                              })
+                                                          }, "" + (String(taskName) + (" : " + (String(pomodoriStr) + ""))));
+                                              }), tasks)))))))));
 }
 
 var make = Timer;
