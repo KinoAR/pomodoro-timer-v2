@@ -103,6 +103,7 @@ function Timer(Props) {
     var match = intervalIdRef[0];
     if (match !== undefined) {
       clearInterval(Caml_option.valFromOption(match));
+      intervalIdRef[0] = undefined;
       return /* () */0;
     } else {
       return /* () */0;

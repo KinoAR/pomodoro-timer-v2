@@ -66,7 +66,10 @@ let make = () => {
 
   let stopTimer = () => {
     switch(intervalIdRef^) {
-      | Some(intervalID) => Js.Global.clearInterval(intervalID)
+      | Some(intervalID) => {
+        Js.Global.clearInterval(intervalID);
+        intervalIdRef:=None
+      }
       | None => ()
     };
   };
