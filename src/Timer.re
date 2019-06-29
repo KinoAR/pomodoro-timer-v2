@@ -14,12 +14,16 @@ type state = {
   initialTime:int,
   pomodoroState: pomodoroState,
   currentTask:task,
+  taskNameInput:string,
+  title:string,
   tasks: list(task)
 };
 
 type action = 
 | Click(string)
 | ClickTask(int)
+| ClickNewTask(string)
+| UpdateTaskName(string)
 | Tick
 | Reset;
 
@@ -33,6 +37,10 @@ type timerButton = {
   className:string,
   fn: unit => unit
 };
+
+let createTask  = (taskName) => {
+  {name:taskName, pomodori:0};
+}
 
 
 //Has to be outside of the component to prevent it 
@@ -52,7 +60,9 @@ let make = () => {
     | ClickTask(taskIndex) => {...state, currentTask: List.nth(state.tasks, taskIndex)}
     | Tick => {...state, timer: state.timer  - 1}
     | Reset => {...state, timer: state.initialTime}
-  }, {running:false, timer:300, initialTime: 300, pomodoroState: Pomodoro, tasks: [], currentTask:{name:"", pomodori:0}})
+    | UpdateTaskName(taskName) => {...state, taskNameInput: taskName}
+    | _ => state
+  }, {running:false, title:"Add Task", taskNameInput: "", timer:300, initialTime: 300, pomodoroState: Pomodoro, tasks: [], currentTask:{name:"", pomodori:0}})
   
   let startTimer = () => {
     switch(intervalIdRef^) {
@@ -103,10 +113,73 @@ let make = () => {
     {j|$displayMinutes:$displaySeconds|j};
   }
 
+  let updateTaskName = (event) => {
+    ReactEvent.Synthetic.preventDefault(event);
+    let value = ReactEvent.Form.target(event);
+    Js.log(value);
+  }
+
   let tasks = state.tasks;
   let listToReactArray = (list) => list |> Array.of_list |> ReasonReact.array;
 
   <div className="row">
+    <div className="modal" role="dialog">
+     <div className="modal-dialog" role="document">
+      <div className="modal-content">
+        <div className="modal-header">
+          <div className="modal-title">
+            {ReasonReact.string(state.title)}
+          </div>
+          {ReactDOMRe.createElementVariadic(
+            "button",
+            ~props=(ReactDOMRe.objToDOMProps({
+              "data-dismiss": "modal",
+              "type": "button",
+              "className": "close",
+              "aria-label": "Close"
+              })),
+            [|
+              (<span ariaHidden={true}>{ReasonReact.string("&times;")}</span>)
+            |]
+          )}
+          <div className="modal-body">
+          {
+            switch(state.title) {
+              | "Add Task" => {
+                <div className="row">
+                  <div className="col-12">
+                    <form action="">
+                      <div className="form-group">
+                        <label htmlFor="Task Name">{ReasonReact.string("Task Name")}</label>
+                        <input onChange={(e) => updateTaskName(e)} type_="text" name="taskName" id="taskName" placeholder="Enter Task Name"/>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              }
+              | _ => ReasonReact.null
+            }
+          }
+          </div>
+          <div className="modal-footer">
+          <div className="btn btn-primary">
+           {ReasonReact.string("Save Changes")}
+          </div>
+            {ReactDOMRe.createElementVariadic(
+            "button",
+            ~props=(ReactDOMRe.objToDOMProps({
+              "data-dismiss": "modal",
+              "type": "button",
+              "className": "btn btn-secondary",
+              "aria-label": "Close"
+              })),
+              [|ReasonReact.string("Close")|]
+            )}
+          </div>
+        </div>
+      </div>
+     </div>
+    </div>
     <div className="offset-4 col-4">
         <div className="col-12 text-center">
           <div className="btn-group">
@@ -163,11 +236,14 @@ let make = () => {
           </div>) : ReasonReact.null
         } 
         </div>
-        <div className="col-12">
+        <div className="col-12 task-area">
           <h4> {ReasonReact.string("Tasks")} </h4>
           <div className="row">
             <div className="col-12">
               <ul className="list-group">
+                <li onClick={(_) => () } className="list-group-item task-area">
+                  {ReasonReact.string("Add a new task")}
+                </li>
                 {
                   List.mapi((index, task:task) => {
                     let taskName = task.name;
