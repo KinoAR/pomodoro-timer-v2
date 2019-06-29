@@ -216,7 +216,8 @@ function Timer(Props) {
   return React.createElement("div", {
               className: "row"
             }, React.createElement("div", {
-                  className: "modal",
+                  className: "modal fade",
+                  id: "pomodoroModal",
                   role: "dialog"
                 }, React.createElement("div", {
                       className: "modal-dialog",
@@ -326,7 +327,12 @@ function Timer(Props) {
                                           onClick: (function (param) {
                                               return /* () */0;
                                             })
-                                        }, "Add a new task"), $$Array.of_list(List.mapi((function (index, task) {
+                                        }, "Add a new task", ReactDOMRe.createElementVariadic("button", {
+                                              "data-toggle": "modal",
+                                              "data-target": "pomodoroModal",
+                                              type: "button",
+                                              className: "btn btn-secondary"
+                                            }, /* array */["Add Task"])), $$Array.of_list(List.mapi((function (index, task) {
                                                 var taskName = task[/* name */0];
                                                 var pomodoriStr = String(task[/* pomodori */1]);
                                                 return React.createElement("li", {

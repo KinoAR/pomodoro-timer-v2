@@ -123,7 +123,7 @@ let make = () => {
   let listToReactArray = (list) => list |> Array.of_list |> ReasonReact.array;
 
   <div className="row">
-    <div className="modal" role="dialog">
+    <div className="modal fade" id="pomodoroModal" role="dialog">
      <div className="modal-dialog" role="document">
       <div className="modal-content">
         <div className="modal-header">
@@ -243,6 +243,19 @@ let make = () => {
               <ul className="list-group">
                 <li onClick={(_) => () } className="list-group-item task-area">
                   {ReasonReact.string("Add a new task")}
+                  {
+                    ReactDOMRe.createElementVariadic(
+                      "button",
+                      ~props=
+                        ReactDOMRe.objToDOMProps({
+                          "data-toggle": "modal",
+                          "data-target": "pomodoroModal",
+                          "type": "button",
+                          "className": "btn btn-secondary",
+                        }),
+                      [|ReasonReact.string("Add Task")|],
+                    );
+                  }
                 </li>
                 {
                   List.mapi((index, task:task) => {
