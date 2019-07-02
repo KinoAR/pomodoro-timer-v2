@@ -145,9 +145,10 @@ let make = () => {
               "aria-label": "Close"
               })),
             [|
-              (<span ariaHidden={true}>{ReasonReact.string("&times;")}</span>)
+              (<span ariaHidden={true}>{ReasonReact.string("Close")}</span>)
             |]
           )}
+          </div>
           <div className="modal-body">
           {
             switch(state.title) {
@@ -168,19 +169,23 @@ let make = () => {
           }
           </div>
           <div className="modal-footer">
-          <div className="btn btn-primary">
-           {ReasonReact.string("Save Changes")}
-          </div>
-            {ReactDOMRe.createElementVariadic(
-            "button",
-            ~props=(ReactDOMRe.objToDOMProps({
-              "data-dismiss": "modal",
-              "type": "button",
-              "className": "btn btn-secondary",
-              "aria-label": "Close"
-              })),
-              [|ReasonReact.string("Close")|]
-            )}
+          <div className="row">
+          <br/>
+          <div className="btn btn-primary"> {ReasonReact.string("Save Changes")} </div>(
+            {
+              ReactDOMRe.createElementVariadic(
+                "button",
+                ~props=
+                  ReactDOMRe.objToDOMProps({
+                    "data-dismiss": "modal",
+                    "type": "button",
+                    "className": "btn btn-secondary",
+                    "aria-label": "Close",
+                  }),
+                [|ReasonReact.string("Close")|],
+              );
+            },
+          )
           </div>
         </div>
       </div>
@@ -199,10 +204,12 @@ let make = () => {
           </div>
         </div>
         <div className="col-12 text-center">
+         <small className="pomodoro-state">{ReasonReact.string(getStatusString(state.pomodoroState))}</small>
+          <hr className="standard-style"/>
           <h1 className="pomodoro-timer">
             {ReasonReact.string(convertTimeToString(state.timer))}
           </h1>
-          <small>{ReasonReact.string(getStatusString(state.pomodoroState))}</small>
+         
         </div>
         <div className="col-12 text-center"> 
           <div className="btn-group">

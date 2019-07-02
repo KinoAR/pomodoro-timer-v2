@@ -1,5 +1,6 @@
 @timer-color:white;
 @text-color:white;
+@alt-text-color: black;
 body {
   background-color: black;
   color:@text-color;
@@ -8,12 +9,25 @@ body {
 h1.pomodoro-timer {
   color:@timer-color;
   font-size: 150px;
+  margin-bottom: 0px;
+}
+
+hr.standard-style {
+  border-top: 1px solid @timer-color;
 }
 
 div.task-area {
-  background-color: black!important;
+  background-color: @alt-text-color!important;
 }
 
 li.task-area {
-  background-color: black !important;
+  background-color:@alt-text-color!important;
+}
+
+small.pomodoro-state {
+  font-size: 32px;
+}
+
+div.modal {
+  color: @alt-text-color!important;
 }

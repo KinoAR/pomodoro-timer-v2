@@ -246,11 +246,13 @@ function Timer(Props) {
                                   "aria-label": "Close"
                                 }, /* array */[React.createElement("span", {
                                         "aria-hidden": true
-                                      }, "&times;")]), React.createElement("div", {
-                                  className: "modal-body"
-                                }, tmp), React.createElement("div", {
-                                  className: "modal-footer"
-                                }, React.createElement("div", {
+                                      }, "Close")])), React.createElement("div", {
+                              className: "modal-body"
+                            }, tmp), React.createElement("div", {
+                              className: "modal-footer"
+                            }, React.createElement("div", {
+                                  className: "row"
+                                }, React.createElement("br", undefined), React.createElement("div", {
                                       className: "btn btn-primary"
                                     }, "Save Changes"), ReactDOMRe.createElementVariadic("button", {
                                       "data-dismiss": "modal",
@@ -291,9 +293,13 @@ function Timer(Props) {
                                   ]
                                 ])))), React.createElement("div", {
                       className: "col-12 text-center"
-                    }, React.createElement("h1", {
+                    }, React.createElement("small", {
+                          className: "pomodoro-state"
+                        }, getStatusString(state[/* pomodoroState */3])), React.createElement("hr", {
+                          className: "standard-style"
+                        }), React.createElement("h1", {
                           className: "pomodoro-timer"
-                        }, convertTimeToString(state[/* timer */1])), React.createElement("small", undefined, getStatusString(state[/* pomodoroState */3]))), React.createElement("div", {
+                        }, convertTimeToString(state[/* timer */1]))), React.createElement("div", {
                       className: "col-12 text-center"
                     }, React.createElement("div", {
                           className: "btn-group"
