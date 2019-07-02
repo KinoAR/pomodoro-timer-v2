@@ -256,7 +256,7 @@ let make = () => {
                       ~props=
                         ReactDOMRe.objToDOMProps({
                           "data-toggle": "modal",
-                          "data-target": "pomodoroModal",
+                          "data-target": "#pomodoroModal",
                           "type": "button",
                           "className": "btn btn-secondary",
                         }),

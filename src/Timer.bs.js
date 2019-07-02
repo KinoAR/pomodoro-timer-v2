@@ -340,7 +340,7 @@ function Timer(Props) {
                                             })
                                         }, "Add a new task", ReactDOMRe.createElementVariadic("button", {
                                               "data-toggle": "modal",
-                                              "data-target": "pomodoroModal",
+                                              "data-target": "#pomodoroModal",
                                               type: "button",
                                               className: "btn btn-secondary"
                                             }, /* array */["Add Task"])), $$Array.of_list(List.mapi((function (index, task) {
