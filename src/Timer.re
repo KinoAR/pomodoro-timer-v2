@@ -58,22 +58,19 @@ let make = () => {
      | _ => state
     }
     | ClickTask(taskIndex) => {...state, currentTask: List.nth(state.tasks, taskIndex)}
-    | Tick => {...state, timer: state.timer  - 1}
+    | Tick => {
+      switch(state.timer) {
+        | 0 => state
+        | _ => {...state, timer: state.timer - 1}
+      };
+      // state.timer > 0 ? {...state, timer: state.timer - 1} : state;
+    } 
     | Reset => {...state, timer: state.initialTime}
     | UpdateTaskName(taskName) => {...state, taskNameInput: taskName}
     | _ => state
   }, {running:false, title:"Add Task", taskNameInput: "", timer:300, initialTime: 300, pomodoroState: Pomodoro, tasks: [], currentTask:{name:"", pomodori:0}})
   
-  let startTimer = () => {
-    switch(intervalIdRef^) {
-      | Some(_) => ()
-      | None => {
-        let intervalId = Js.Global.setInterval(() => dispatch(Tick), 1000);
-        intervalIdRef := Some(intervalId);
-      }
-    };
-  };
-
+  
   let stopTimer = () => {
     switch(intervalIdRef^) {
       | Some(intervalID) => {
@@ -88,6 +85,25 @@ let make = () => {
     stopTimer();
     dispatch(Reset);
   }
+
+  let startTimer = () => {
+    switch (intervalIdRef^) {
+    | Some(_) => ()
+    | None =>
+      let intervalId =
+        Js.Global.setInterval(
+          () => {
+            if (state.timer > 0) {
+              resetTimer();
+            };
+            dispatch(Tick);
+          },
+          1000,
+        );
+      intervalIdRef := Some(intervalId);
+    };
+  };
+
 
   let commands = [
     {name:"pomodoro", uiName: "Pomodoro"},

@@ -22,16 +22,21 @@ function Timer(Props) {
   var match = React.useReducer((function (state, action) {
           if (typeof action === "number") {
             if (action === 0) {
-              return /* record */[
-                      /* running */state[/* running */0],
-                      /* timer */state[/* timer */1] - 1 | 0,
-                      /* initialTime */state[/* initialTime */2],
-                      /* pomodoroState */state[/* pomodoroState */3],
-                      /* currentTask */state[/* currentTask */4],
-                      /* taskNameInput */state[/* taskNameInput */5],
-                      /* title */state[/* title */6],
-                      /* tasks */state[/* tasks */7]
-                    ];
+              var match = state[/* timer */1];
+              if (match !== 0) {
+                return /* record */[
+                        /* running */state[/* running */0],
+                        /* timer */state[/* timer */1] - 1 | 0,
+                        /* initialTime */state[/* initialTime */2],
+                        /* pomodoroState */state[/* pomodoroState */3],
+                        /* currentTask */state[/* currentTask */4],
+                        /* taskNameInput */state[/* taskNameInput */5],
+                        /* title */state[/* title */6],
+                        /* tasks */state[/* tasks */7]
+                      ];
+              } else {
+                return state;
+              }
             } else {
               return /* record */[
                       /* running */state[/* running */0],
@@ -126,18 +131,6 @@ function Timer(Props) {
       ]);
   var dispatch = match[1];
   var state = match[0];
-  var startTimer = function (param) {
-    var match = intervalIdRef[0];
-    if (match !== undefined) {
-      return /* () */0;
-    } else {
-      var intervalId = setInterval((function (param) {
-              return Curry._1(dispatch, /* Tick */0);
-            }), 1000);
-      intervalIdRef[0] = Caml_option.some(intervalId);
-      return /* () */0;
-    }
-  };
   var stopTimer = function (param) {
     var match = intervalIdRef[0];
     if (match !== undefined) {
@@ -151,6 +144,22 @@ function Timer(Props) {
   var resetTimer = function (param) {
     stopTimer(/* () */0);
     return Curry._1(dispatch, /* Reset */1);
+  };
+  var startTimer = function (param) {
+    var match = intervalIdRef[0];
+    if (match !== undefined) {
+      return /* () */0;
+    } else {
+      var intervalId = setInterval((function (param) {
+              if (state[/* timer */1] > 0) {
+                stopTimer(/* () */0);
+                Curry._1(dispatch, /* Reset */1);
+              }
+              return Curry._1(dispatch, /* Tick */0);
+            }), 1000);
+      intervalIdRef[0] = Caml_option.some(intervalId);
+      return /* () */0;
+    }
   };
   var timerButtons_000 = /* record */[
     /* name */"Start",
