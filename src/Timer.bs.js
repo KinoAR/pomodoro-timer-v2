@@ -176,6 +176,17 @@ function Timer(Props) {
     timerButtons_000,
     timerButtons_001
   ];
+  var getStatusString = function (status) {
+    switch (status) {
+      case 0 : 
+          return "Pomodoro";
+      case 1 : 
+          return "Short Break";
+      case 2 : 
+          return "Long Break";
+      
+    }
+  };
   var convertTimeToString = function (time) {
     var minutes = time / 60 | 0;
     var seconds = time % 60;
@@ -282,7 +293,7 @@ function Timer(Props) {
                       className: "col-12 text-center"
                     }, React.createElement("h1", {
                           className: "pomodoro-timer"
-                        }, convertTimeToString(state[/* timer */1]))), React.createElement("div", {
+                        }, convertTimeToString(state[/* timer */1])), React.createElement("small", undefined, getStatusString(state[/* pomodoroState */3]))), React.createElement("div", {
                       className: "col-12 text-center"
                     }, React.createElement("div", {
                           className: "btn-group"

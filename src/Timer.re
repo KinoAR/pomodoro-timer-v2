@@ -101,6 +101,12 @@ let make = () => {
     {name: "Reset", className: "btn-secondary", fn:resetTimer},
   ];
 
+  let getStatusString = (status) => switch(status) {
+    | Pomodoro => "Pomodoro"
+    | ShortBreak => "Short Break"
+    | LongBreak => "Long Break"
+  };
+
 
 
   let convertTimeToString = (time) => {
@@ -121,7 +127,7 @@ let make = () => {
 
   let tasks = state.tasks;
   let listToReactArray = (list) => list |> Array.of_list |> ReasonReact.array;
-
+  //Modal Area of the application
   <div className="row">
     <div className="modal fade" id="pomodoroModal" role="dialog">
      <div className="modal-dialog" role="document">
@@ -196,6 +202,7 @@ let make = () => {
           <h1 className="pomodoro-timer">
             {ReasonReact.string(convertTimeToString(state.timer))}
           </h1>
+          <small>{ReasonReact.string(getStatusString(state.pomodoroState))}</small>
         </div>
         <div className="col-12 text-center"> 
           <div className="btn-group">
