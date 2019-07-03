@@ -21,33 +21,49 @@ var intervalIdRef = /* record */[/* contents */undefined];
 function Timer(Props) {
   var match = React.useReducer((function (state, action) {
           if (typeof action === "number") {
-            if (action === 0) {
-              var match = state[/* timer */1];
-              if (match !== 0) {
-                return /* record */[
-                        /* running */state[/* running */0],
-                        /* timer */state[/* timer */1] - 1 | 0,
-                        /* initialTime */state[/* initialTime */2],
-                        /* pomodoroState */state[/* pomodoroState */3],
-                        /* currentTask */state[/* currentTask */4],
-                        /* taskNameInput */state[/* taskNameInput */5],
-                        /* title */state[/* title */6],
-                        /* tasks */state[/* tasks */7]
-                      ];
-              } else {
-                return state;
-              }
-            } else {
-              return /* record */[
-                      /* running */state[/* running */0],
-                      /* timer */state[/* initialTime */2],
-                      /* initialTime */state[/* initialTime */2],
-                      /* pomodoroState */state[/* pomodoroState */3],
-                      /* currentTask */state[/* currentTask */4],
-                      /* taskNameInput */state[/* taskNameInput */5],
-                      /* title */state[/* title */6],
-                      /* tasks */state[/* tasks */7]
-                    ];
+            switch (action) {
+              case 0 : 
+                  var match = state[/* timer */1];
+                  if (match !== 0) {
+                    return /* record */[
+                            /* running */state[/* running */0],
+                            /* timer */state[/* timer */1] - 1 | 0,
+                            /* initialTime */state[/* initialTime */2],
+                            /* pomodoroState */state[/* pomodoroState */3],
+                            /* pomodoroCount */state[/* pomodoroCount */4],
+                            /* currentTask */state[/* currentTask */5],
+                            /* taskNameInput */state[/* taskNameInput */6],
+                            /* title */state[/* title */7],
+                            /* tasks */state[/* tasks */8]
+                          ];
+                  } else {
+                    return state;
+                  }
+              case 1 : 
+                  return /* record */[
+                          /* running */state[/* running */0],
+                          /* timer */state[/* timer */1],
+                          /* initialTime */state[/* initialTime */2],
+                          /* pomodoroState */state[/* pomodoroState */3],
+                          /* pomodoroCount */state[/* pomodoroCount */4] + 1 | 0,
+                          /* currentTask */state[/* currentTask */5],
+                          /* taskNameInput */state[/* taskNameInput */6],
+                          /* title */state[/* title */7],
+                          /* tasks */state[/* tasks */8]
+                        ];
+              case 2 : 
+                  return /* record */[
+                          /* running */state[/* running */0],
+                          /* timer */state[/* initialTime */2],
+                          /* initialTime */state[/* initialTime */2],
+                          /* pomodoroState */state[/* pomodoroState */3],
+                          /* pomodoroCount */state[/* pomodoroCount */4],
+                          /* currentTask */state[/* currentTask */5],
+                          /* taskNameInput */state[/* taskNameInput */6],
+                          /* title */state[/* title */7],
+                          /* tasks */state[/* tasks */8]
+                        ];
+              
             }
           } else {
             switch (action.tag | 0) {
@@ -59,10 +75,11 @@ function Timer(Props) {
                                 /* timer */900,
                                 /* initialTime */900,
                                 /* pomodoroState : LongBreak */2,
-                                /* currentTask */state[/* currentTask */4],
-                                /* taskNameInput */state[/* taskNameInput */5],
-                                /* title */state[/* title */6],
-                                /* tasks */state[/* tasks */7]
+                                /* pomodoroCount */state[/* pomodoroCount */4],
+                                /* currentTask */state[/* currentTask */5],
+                                /* taskNameInput */state[/* taskNameInput */6],
+                                /* title */state[/* title */7],
+                                /* tasks */state[/* tasks */8]
                               ];
                     case "pomodoro" : 
                         return /* record */[
@@ -70,21 +87,23 @@ function Timer(Props) {
                                 /* timer */1500,
                                 /* initialTime */1500,
                                 /* pomodoroState : Pomodoro */0,
-                                /* currentTask */state[/* currentTask */4],
-                                /* taskNameInput */state[/* taskNameInput */5],
-                                /* title */state[/* title */6],
-                                /* tasks */state[/* tasks */7]
+                                /* pomodoroCount */state[/* pomodoroCount */4],
+                                /* currentTask */state[/* currentTask */5],
+                                /* taskNameInput */state[/* taskNameInput */6],
+                                /* title */state[/* title */7],
+                                /* tasks */state[/* tasks */8]
                               ];
                     case "shortbreak" : 
                         return /* record */[
                                 /* running */state[/* running */0],
-                                /* timer */300,
-                                /* initialTime */900,
+                                /* timer */10,
+                                /* initialTime */300,
                                 /* pomodoroState : ShortBreak */1,
-                                /* currentTask */state[/* currentTask */4],
-                                /* taskNameInput */state[/* taskNameInput */5],
-                                /* title */state[/* title */6],
-                                /* tasks */state[/* tasks */7]
+                                /* pomodoroCount */state[/* pomodoroCount */4],
+                                /* currentTask */state[/* currentTask */5],
+                                /* taskNameInput */state[/* taskNameInput */6],
+                                /* title */state[/* title */7],
+                                /* tasks */state[/* tasks */8]
                               ];
                     default:
                       return state;
@@ -95,10 +114,11 @@ function Timer(Props) {
                           /* timer */state[/* timer */1],
                           /* initialTime */state[/* initialTime */2],
                           /* pomodoroState */state[/* pomodoroState */3],
-                          /* currentTask */List.nth(state[/* tasks */7], action[0]),
-                          /* taskNameInput */state[/* taskNameInput */5],
-                          /* title */state[/* title */6],
-                          /* tasks */state[/* tasks */7]
+                          /* pomodoroCount */state[/* pomodoroCount */4],
+                          /* currentTask */List.nth(state[/* tasks */8], action[0]),
+                          /* taskNameInput */state[/* taskNameInput */6],
+                          /* title */state[/* title */7],
+                          /* tasks */state[/* tasks */8]
                         ];
               case 2 : 
                   return state;
@@ -108,10 +128,11 @@ function Timer(Props) {
                           /* timer */state[/* timer */1],
                           /* initialTime */state[/* initialTime */2],
                           /* pomodoroState */state[/* pomodoroState */3],
-                          /* currentTask */state[/* currentTask */4],
+                          /* pomodoroCount */state[/* pomodoroCount */4],
+                          /* currentTask */state[/* currentTask */5],
                           /* taskNameInput */action[0],
-                          /* title */state[/* title */6],
-                          /* tasks */state[/* tasks */7]
+                          /* title */state[/* title */7],
+                          /* tasks */state[/* tasks */8]
                         ];
               
             }
@@ -121,6 +142,7 @@ function Timer(Props) {
         /* timer */300,
         /* initialTime */300,
         /* pomodoroState : Pomodoro */0,
+        /* pomodoroCount */0,
         /* currentTask : record */[
           /* name */"",
           /* pomodori */0
@@ -143,7 +165,7 @@ function Timer(Props) {
   };
   var resetTimer = function (param) {
     stopTimer(/* () */0);
-    return Curry._1(dispatch, /* Reset */1);
+    return Curry._1(dispatch, /* Reset */2);
   };
   var startTimer = function (param) {
     var match = intervalIdRef[0];
@@ -151,10 +173,6 @@ function Timer(Props) {
       return /* () */0;
     } else {
       var intervalId = setInterval((function (param) {
-              if (state[/* timer */1] > 0) {
-                stopTimer(/* () */0);
-                Curry._1(dispatch, /* Reset */1);
-              }
               return Curry._1(dispatch, /* Tick */0);
             }), 1000);
       intervalIdRef[0] = Caml_option.some(intervalId);
@@ -204,11 +222,35 @@ function Timer(Props) {
     var match = strMinutes.length < 2;
     var displayMinutes = match ? "0" + strMinutes : strMinutes;
     var match$1 = strSeconds.length < 2;
-    var displaySeconds = match$1 ? strSeconds + "0" : strSeconds;
+    var displaySeconds = match$1 ? "0" + strSeconds : strSeconds;
     return "" + (String(displayMinutes) + (":" + (String(displaySeconds) + "")));
   };
-  var tasks = state[/* tasks */7];
-  var match$1 = state[/* title */6];
+  var tasks = state[/* tasks */8];
+  var handleTimeUpdate = function (state) {
+    if (state[/* timer */1] === 0) {
+      var remainderPomoCount = state[/* pomodoroCount */4] / 3 | 0;
+      var statusTuple_000 = state[/* pomodoroState */3];
+      stopTimer(/* () */0);
+      Curry._1(dispatch, /* Reset */2);
+      if (statusTuple_000 !== 0) {
+        return /* () */0;
+      } else if (remainderPomoCount > 0) {
+        if (remainderPomoCount >= 3) {
+          return /* () */0;
+        } else {
+          return Curry._1(dispatch, /* Click */Block.__(0, ["shortbreak"]));
+        }
+      } else if (remainderPomoCount >= 0) {
+        return Curry._1(dispatch, /* Click */Block.__(0, ["longbreak"]));
+      } else {
+        return /* () */0;
+      }
+    } else {
+      return 0;
+    }
+  };
+  handleTimeUpdate(state);
+  var match$1 = state[/* title */7];
   var tmp = match$1 === "Add Task" ? React.createElement("div", {
           className: "row"
         }, React.createElement("div", {
@@ -232,7 +274,7 @@ function Timer(Props) {
                               return /* () */0;
                             })
                         }))))) : null;
-  var match$2 = state[/* currentTask */4][/* name */0].length !== 0;
+  var match$2 = state[/* currentTask */5][/* name */0].length !== 0;
   return React.createElement("div", {
               className: "row"
             }, React.createElement("div", {
@@ -248,7 +290,7 @@ function Timer(Props) {
                               className: "modal-header"
                             }, React.createElement("div", {
                                   className: "modal-title"
-                                }, state[/* title */6]), ReactDOMRe.createElementVariadic("button", {
+                                }, state[/* title */7]), ReactDOMRe.createElementVariadic("button", {
                                   "data-dismiss": "modal",
                                   type: "button",
                                   className: "close",
@@ -337,7 +379,7 @@ function Timer(Props) {
                                                 className: "card-body"
                                               }, React.createElement("h5", {
                                                     className: "card-title"
-                                                  }, state[/* currentTask */4][/* name */0]), React.createElement("a", {
+                                                  }, state[/* currentTask */5][/* name */0]), React.createElement("a", {
                                                     className: "btn btn-outline-primary",
                                                     href: ""
                                                   }, "Done")))))) : null), React.createElement("div", {

@@ -13,6 +13,7 @@ type state = {
   timer:int,
   initialTime:int,
   pomodoroState: pomodoroState,
+  pomodoroCount: int,
   currentTask:task,
   taskNameInput:string,
   title:string,
@@ -25,6 +26,7 @@ type action =
 | ClickNewTask(string)
 | UpdateTaskName(string)
 | Tick
+| CompletePomodoro
 | Reset;
 
 type command = {
@@ -47,13 +49,14 @@ let createTask  = (taskName) => {
 //from being reinitialized on rerender
 let intervalIdRef = ref(None);
 
+//Everything within this function gets updated on rerender
 [@react.component]
 let make = () => {
   let (state, dispatch) = React.useReducer((state, action) => 
   switch(action) {
     | Click(actionName) => switch(actionName) {
      | "pomodoro" => {...state, pomodoroState: Pomodoro, timer: 1500, initialTime: 1500}
-     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: 300, initialTime: 900}
+     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: 10, initialTime: 300}
      | "longbreak" => {...state, pomodoroState: LongBreak, timer: 900, initialTime: 900}
      | _ => state
     }
@@ -66,9 +69,10 @@ let make = () => {
       // state.timer > 0 ? {...state, timer: state.timer - 1} : state;
     } 
     | Reset => {...state, timer: state.initialTime}
+    | CompletePomodoro => {...state, pomodoroCount: state.pomodoroCount + 1}
     | UpdateTaskName(taskName) => {...state, taskNameInput: taskName}
     | _ => state
-  }, {running:false, title:"Add Task", taskNameInput: "", timer:300, initialTime: 300, pomodoroState: Pomodoro, tasks: [], currentTask:{name:"", pomodori:0}})
+  }, {running:false, title:"Add Task", pomodoroCount: 0, taskNameInput: "", timer:300, initialTime: 300, pomodoroState: Pomodoro, tasks: [], currentTask:{name:"", pomodori:0}})
   
   
   let stopTimer = () => {
@@ -93,9 +97,9 @@ let make = () => {
       let intervalId =
         Js.Global.setInterval(
           () => {
-            if (state.timer > 0) {
-              resetTimer();
-            };
+            //State not updated here, because the function is run once on click
+            //This function would only get a new state when you click, but is recreated
+            // on rerender
             dispatch(Tick);
           },
           1000,
@@ -131,7 +135,7 @@ let make = () => {
     let strSeconds = seconds |> string_of_int;
     let strMinutes = minutes |> string_of_int;
     let displayMinutes = String.length(strMinutes) < 2 ? "0" ++ strMinutes : strMinutes;
-    let displaySeconds = String.length(strSeconds) < 2 ? strSeconds ++ "0" : strSeconds;
+    let displaySeconds = String.length(strSeconds) < 2 ? "0" ++ strSeconds : strSeconds;
     {j|$displayMinutes:$displaySeconds|j};
   }
 
@@ -143,7 +147,29 @@ let make = () => {
 
   let tasks = state.tasks;
   let listToReactArray = (list) => list |> Array.of_list |> ReasonReact.array;
-  //Modal Area of the application
+  
+  let handleTimeUpdate = (state) => {
+    if (state.timer == 0) {
+      let remainderPomoCount = state.pomodoroCount / 3;
+      let statusTuple = (state.pomodoroState, remainderPomoCount);
+      resetTimer()
+      switch(statusTuple) {
+        | (Pomodoro, 1) => {
+          dispatch(Click("shortbreak"))
+        }
+        | (Pomodoro, 2) => {
+          dispatch(Click("shortbreak"))
+        }
+        | (Pomodoro, 0) => {
+          dispatch(Click("longbreak"))
+        }
+        | (_, _) => ()
+      };
+    };
+  };
+
+  handleTimeUpdate(state);
+  /*Modal Area of the applicatio*/
   <div className="row">
     <div className="modal fade" id="pomodoroModal" role="dialog">
      <div className="modal-dialog" role="document">
