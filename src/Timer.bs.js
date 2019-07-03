@@ -96,7 +96,7 @@ function Timer(Props) {
                     case "shortbreak" : 
                         return /* record */[
                                 /* running */state[/* running */0],
-                                /* timer */10,
+                                /* timer */300,
                                 /* initialTime */300,
                                 /* pomodoroState : ShortBreak */1,
                                 /* pomodoroCount */state[/* pomodoroCount */4],
@@ -228,12 +228,16 @@ function Timer(Props) {
   var tasks = state[/* tasks */8];
   var handleTimeUpdate = function (state) {
     if (state[/* timer */1] === 0) {
+      if (state[/* pomodoroState */3] === /* Pomodoro */0) {
+        console.log("Pomodoro Complete");
+        Curry._1(dispatch, /* CompletePomodoro */1);
+      }
       var remainderPomoCount = state[/* pomodoroCount */4] / 3 | 0;
       var statusTuple_000 = state[/* pomodoroState */3];
       stopTimer(/* () */0);
       Curry._1(dispatch, /* Reset */2);
       if (statusTuple_000 !== 0) {
-        return /* () */0;
+        return Curry._1(dispatch, /* Click */Block.__(0, ["pomodoro"]));
       } else if (remainderPomoCount > 0) {
         if (remainderPomoCount >= 3) {
           return /* () */0;

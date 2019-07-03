@@ -4,11 +4,14 @@
 var React = require("react");
 var ReactDOMRe = require("reason-react/src/ReactDOMRe.js");
 var Timer$ReactHooksTemplate = require("./Timer.bs.js");
+var Settings$ReactHooksTemplate = require("./Settings.bs.js");
 
 
   require("./styles.css");
 
 ;
+
+ReactDOMRe.renderToElementWithId(React.createElement(Settings$ReactHooksTemplate.make, { }), "settings");
 
 ReactDOMRe.renderToElementWithId(React.createElement(Timer$ReactHooksTemplate.make, { }), "timer");
 

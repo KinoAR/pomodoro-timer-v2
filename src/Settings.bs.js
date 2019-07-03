@@ -13,7 +13,13 @@ function Settings(Props) {
       ]);
   return React.createElement("div", {
               className: "row"
-            }, React.createElement("h2", undefined, "Options"));
+            }, React.createElement("div", {
+                  className: "col-12 text-center"
+                }, React.createElement("h2", undefined, "Options"), React.createElement("div", {
+                      className: "row"
+                    }, React.createElement("div", {
+                          className: "col-12"
+                        }))));
 }
 
 var make = Settings;

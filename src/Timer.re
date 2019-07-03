@@ -56,7 +56,7 @@ let make = () => {
   switch(action) {
     | Click(actionName) => switch(actionName) {
      | "pomodoro" => {...state, pomodoroState: Pomodoro, timer: 1500, initialTime: 1500}
-     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: 10, initialTime: 300}
+     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: 300, initialTime: 300}
      | "longbreak" => {...state, pomodoroState: LongBreak, timer: 900, initialTime: 900}
      | _ => state
     }
@@ -150,19 +150,19 @@ let make = () => {
   
   let handleTimeUpdate = (state) => {
     if (state.timer == 0) {
+      if(state.pomodoroState == Pomodoro) {
+        Js.log("Pomodoro Complete")
+        dispatch(CompletePomodoro);
+      };
       let remainderPomoCount = state.pomodoroCount / 3;
       let statusTuple = (state.pomodoroState, remainderPomoCount);
       resetTimer()
       switch(statusTuple) {
-        | (Pomodoro, 1) => {
-          dispatch(Click("shortbreak"))
-        }
-        | (Pomodoro, 2) => {
-          dispatch(Click("shortbreak"))
-        }
-        | (Pomodoro, 0) => {
-          dispatch(Click("longbreak"))
-        }
+        | (Pomodoro, 1) => dispatch(Click("shortbreak"))
+        | (Pomodoro, 2) => dispatch(Click("shortbreak"))
+        | (Pomodoro, 0) => dispatch(Click("longbreak"))
+        | (ShortBreak, _) => dispatch(Click("pomodoro"))
+        | (LongBreak, _) => dispatch(Click("pomodoro"))
         | (_, _) => ()
       };
     };
