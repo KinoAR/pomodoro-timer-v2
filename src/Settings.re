@@ -1,5 +1,11 @@
+
+type pomodoroState =
+| Pomodoro
+| ShortBreak
+| LongBreak;
+
 type action =
-| UpdateTime(string, int) 
+| UpdateTime(pomodoroState, int) 
 | Click;
 
 type state = {
@@ -13,6 +19,11 @@ type state = {
 let make = () => {
   let (state, dispatch) = React.useReducer((state, action) => 
   switch(action) {
+    | UpdateTime(pomodoroState, time) => switch(pomodoroState) {
+      | Pomodoro => {...state, pomodoroTime: time}
+      | ShortBreak => {...state, shortBreakTime: time}
+      | LongBreak => {...state, longBreakTime: time}
+    }
     | _ => state
   },{pomodoroTime:1500, shortBreakTime: 300, longBreakTime: 900});
 

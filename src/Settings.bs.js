@@ -5,7 +5,32 @@ var React = require("react");
 
 function Settings(Props) {
   React.useReducer((function (state, action) {
-          return state;
+          if (action) {
+            var time = action[1];
+            switch (action[0]) {
+              case 0 : 
+                  return /* record */[
+                          /* pomodoroTime */time,
+                          /* shortBreakTime */state[/* shortBreakTime */1],
+                          /* longBreakTime */state[/* longBreakTime */2]
+                        ];
+              case 1 : 
+                  return /* record */[
+                          /* pomodoroTime */state[/* pomodoroTime */0],
+                          /* shortBreakTime */time,
+                          /* longBreakTime */state[/* longBreakTime */2]
+                        ];
+              case 2 : 
+                  return /* record */[
+                          /* pomodoroTime */state[/* pomodoroTime */0],
+                          /* shortBreakTime */state[/* shortBreakTime */1],
+                          /* longBreakTime */time
+                        ];
+              
+            }
+          } else {
+            return state;
+          }
         }), /* record */[
         /* pomodoroTime */1500,
         /* shortBreakTime */300,
