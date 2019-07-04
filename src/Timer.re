@@ -169,7 +169,7 @@ let make = () => {
   };
 
   handleTimeUpdate(state);
-  /*Modal Area of the applicatio*/
+  /* Modal Area of the application */
   <div className="row">
     <div className="modal fade" id="pomodoroModal" role="dialog">
      <div className="modal-dialog" role="document">
