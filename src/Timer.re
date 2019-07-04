@@ -51,13 +51,13 @@ let intervalIdRef = ref(None);
 
 //Everything within this function gets updated on rerender
 [@react.component]
-let make = () => {
+let make = (~pomodoro, ~shortBreak, ~longBreak) => {
   let (state, dispatch) = React.useReducer((state, action) => 
   switch(action) {
     | Click(actionName) => switch(actionName) {
-     | "pomodoro" => {...state, pomodoroState: Pomodoro, timer: 1500, initialTime: 1500}
-     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: 300, initialTime: 300}
-     | "longbreak" => {...state, pomodoroState: LongBreak, timer: 900, initialTime: 900}
+     | "pomodoro" => {...state, pomodoroState: Pomodoro, timer: pomodoro, initialTime: pomodoro}
+     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: shortBreak, initialTime: shortBreak}
+     | "longbreak" => {...state, pomodoroState: LongBreak, timer: longBreak, initialTime: longBreak}
      | _ => state
     }
     | ClickTask(taskIndex) => {...state, currentTask: List.nth(state.tasks, taskIndex)}

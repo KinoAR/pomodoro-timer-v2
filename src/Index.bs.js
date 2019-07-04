@@ -11,8 +11,17 @@ var Settings$ReactHooksTemplate = require("./Settings.bs.js");
 
 ;
 
-ReactDOMRe.renderToElementWithId(React.createElement(Settings$ReactHooksTemplate.make, { }), "settings");
+function timerFunc(pomodoro, shortBreak, longBreak) {
+  return React.createElement(Timer$ReactHooksTemplate.make, {
+              pomodoro: pomodoro,
+              shortBreak: shortBreak,
+              longBreak: longBreak
+            });
+}
 
-ReactDOMRe.renderToElementWithId(React.createElement(Timer$ReactHooksTemplate.make, { }), "timer");
+ReactDOMRe.renderToElementWithId(React.createElement(Settings$ReactHooksTemplate.make, {
+          timerFunc: timerFunc
+        }), "settings");
 
+exports.timerFunc = timerFunc;
 /*  Not a pure module */

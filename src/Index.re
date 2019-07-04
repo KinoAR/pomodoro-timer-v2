@@ -2,5 +2,7 @@
 {|
   require("./styles.css");
 |}];
-ReactDOMRe.renderToElementWithId(<Settings />, "settings");
-ReactDOMRe.renderToElementWithId(<Timer />, "timer");
+
+let timerFunc = (~pomodoro, ~shortBreak, ~longBreak) => <Timer pomodoro={pomodoro} shortBreak={shortBreak} longBreak={longBreak} />;
+ReactDOMRe.renderToElementWithId(<Settings timerFunc=timerFunc />, "settings");
+

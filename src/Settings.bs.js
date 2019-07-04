@@ -8,65 +8,81 @@ var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var ReactDOMRe = require("reason-react/src/ReactDOMRe.js");
 
 function Settings(Props) {
+  var timerFunc = Props.timerFunc;
   var match = React.useReducer((function (state, action) {
-          if (action) {
+          if (typeof action === "number") {
+            if (action !== 0) {
+              return state;
+            } else {
+              return /* record */[
+                      /* pomodoroTime */state[/* tempPomodoroTime */1],
+                      /* tempPomodoroTime */state[/* tempPomodoroTime */1],
+                      /* shortBreakTime */state[/* tempShortBreakTime */3],
+                      /* tempShortBreakTime */state[/* tempShortBreakTime */3],
+                      /* longBreakTime */state[/* tempLongBreakTime */5],
+                      /* tempLongBreakTime */state[/* tempLongBreakTime */5]
+                    ];
+            }
+          } else {
             var time = action[1];
             switch (action[0]) {
               case 0 : 
                   return /* record */[
-                          /* pomodoroTime */time,
-                          /* shortBreakTime */state[/* shortBreakTime */1],
-                          /* longBreakTime */state[/* longBreakTime */2]
+                          /* pomodoroTime */state[/* pomodoroTime */0],
+                          /* tempPomodoroTime */time,
+                          /* shortBreakTime */state[/* shortBreakTime */2],
+                          /* tempShortBreakTime */state[/* tempShortBreakTime */3],
+                          /* longBreakTime */state[/* longBreakTime */4],
+                          /* tempLongBreakTime */state[/* tempLongBreakTime */5]
                         ];
               case 1 : 
                   return /* record */[
                           /* pomodoroTime */state[/* pomodoroTime */0],
-                          /* shortBreakTime */time,
-                          /* longBreakTime */state[/* longBreakTime */2]
+                          /* tempPomodoroTime */state[/* tempPomodoroTime */1],
+                          /* shortBreakTime */state[/* shortBreakTime */2],
+                          /* tempShortBreakTime */time,
+                          /* longBreakTime */state[/* longBreakTime */4],
+                          /* tempLongBreakTime */state[/* tempLongBreakTime */5]
                         ];
               case 2 : 
                   return /* record */[
                           /* pomodoroTime */state[/* pomodoroTime */0],
-                          /* shortBreakTime */state[/* shortBreakTime */1],
-                          /* longBreakTime */time
+                          /* tempPomodoroTime */state[/* tempPomodoroTime */1],
+                          /* shortBreakTime */state[/* shortBreakTime */2],
+                          /* tempShortBreakTime */state[/* tempShortBreakTime */3],
+                          /* longBreakTime */state[/* longBreakTime */4],
+                          /* tempLongBreakTime */time
                         ];
               
             }
-          } else {
-            return state;
           }
         }), /* record */[
         /* pomodoroTime */1500,
+        /* tempPomodoroTime */1500,
         /* shortBreakTime */300,
-        /* longBreakTime */900
+        /* tempShortBreakTime */300,
+        /* longBreakTime */900,
+        /* tempLongBreakTime */900
       ]);
   var dispatch = match[1];
   var state = match[0];
   var settingInputs = /* array */[
     /* record */[
       /* name */"Pomodoro Time",
+      /* id */"pomodoroTime",
       /* timeType : Pomodoro */0
     ],
     /* record */[
       /* name */"Short Break Time",
+      /* id */"shortBreakTime",
       /* timeType : ShortBreak */1
     ],
     /* record */[
       /* name */"Long Break Time",
+      /* id */"longBreakTime",
       /* timeType : LongBreak */2
     ]
   ];
-  var getTimeByTimeType = function (timeType) {
-    switch (timeType) {
-      case 0 : 
-          return state[/* pomodoroTime */0];
-      case 1 : 
-          return state[/* shortBreakTime */1];
-      case 2 : 
-          return state[/* longBreakTime */2];
-      
-    }
-  };
   return React.createElement("div", {
               className: "row"
             }, React.createElement("div", {
@@ -106,14 +122,14 @@ function Settings(Props) {
                                                           }, React.createElement("label", {
                                                                 htmlFor: "Time"
                                                               }, input[/* name */0]), React.createElement("input", {
+                                                                className: "form-input",
                                                                 name: "time",
                                                                 type: "text",
-                                                                value: String(getTimeByTimeType(input[/* timeType */1]) / 60 | 0),
                                                                 onChange: (function (e) {
-                                                                    var time = input[/* timeType */1];
+                                                                    var time = input[/* timeType */2];
                                                                     var $$event = e;
                                                                     var value = $$event.target.value;
-                                                                    return Curry._1(dispatch, /* UpdateTime */[
+                                                                    return Curry._1(dispatch, /* UpdateTempTime */[
                                                                                 time,
                                                                                 Caml_int32.imul(value, 60)
                                                                               ]);
@@ -124,7 +140,10 @@ function Settings(Props) {
                             }, React.createElement("div", {
                                   className: "row"
                                 }, React.createElement("br", undefined), React.createElement("div", {
-                                      className: "btn btn-primary"
+                                      className: "btn btn-primary",
+                                      onClick: (function (param) {
+                                          return Curry._1(dispatch, /* UpdateTime */0);
+                                        })
                                     }, "Save Changes"), ReactDOMRe.createElementVariadic("button", {
                                       "data-dismiss": "modal",
                                       type: "button",
@@ -136,7 +155,14 @@ function Settings(Props) {
                       className: "row"
                     }, React.createElement("div", {
                           className: "col-12"
-                        }))));
+                        }, ReactDOMRe.createElementVariadic("button", {
+                              "data-toggle": "modal",
+                              "data-target": "#settingsModal",
+                              type: "button",
+                              className: "btn btn-secondary"
+                            }, /* array */["Settings"])))), React.createElement("div", {
+                  className: "col-12"
+                }, Curry._3(timerFunc, state[/* pomodoroTime */0], state[/* shortBreakTime */2], state[/* longBreakTime */4])));
 }
 
 var make = Settings;

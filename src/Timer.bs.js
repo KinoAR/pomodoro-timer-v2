@@ -19,6 +19,9 @@ function createTask(taskName) {
 var intervalIdRef = /* record */[/* contents */undefined];
 
 function Timer(Props) {
+  var pomodoro = Props.pomodoro;
+  var shortBreak = Props.shortBreak;
+  var longBreak = Props.longBreak;
   var match = React.useReducer((function (state, action) {
           if (typeof action === "number") {
             switch (action) {
@@ -72,8 +75,8 @@ function Timer(Props) {
                     case "longbreak" : 
                         return /* record */[
                                 /* running */state[/* running */0],
-                                /* timer */900,
-                                /* initialTime */900,
+                                /* timer */longBreak,
+                                /* initialTime */longBreak,
                                 /* pomodoroState : LongBreak */2,
                                 /* pomodoroCount */state[/* pomodoroCount */4],
                                 /* currentTask */state[/* currentTask */5],
@@ -84,8 +87,8 @@ function Timer(Props) {
                     case "pomodoro" : 
                         return /* record */[
                                 /* running */state[/* running */0],
-                                /* timer */1500,
-                                /* initialTime */1500,
+                                /* timer */pomodoro,
+                                /* initialTime */pomodoro,
                                 /* pomodoroState : Pomodoro */0,
                                 /* pomodoroCount */state[/* pomodoroCount */4],
                                 /* currentTask */state[/* currentTask */5],
@@ -96,8 +99,8 @@ function Timer(Props) {
                     case "shortbreak" : 
                         return /* record */[
                                 /* running */state[/* running */0],
-                                /* timer */300,
-                                /* initialTime */300,
+                                /* timer */shortBreak,
+                                /* initialTime */shortBreak,
                                 /* pomodoroState : ShortBreak */1,
                                 /* pomodoroCount */state[/* pomodoroCount */4],
                                 /* currentTask */state[/* currentTask */5],
