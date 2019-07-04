@@ -205,6 +205,8 @@ function Timer(Props) {
                                                 key: String(index),
                                                 className: "btn btn-primary",
                                                 onClick: (function (param) {
+                                                    stopTimer(/* () */0);
+                                                    Curry._1(dispatch, /* Reset */2);
                                                     return Curry._1(dispatch, /* Click */[command[/* name */0]]);
                                                   })
                                               }, command[/* uiName */1]);

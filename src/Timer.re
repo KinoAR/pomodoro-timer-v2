@@ -155,7 +155,10 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
           <div className="btn-group">
           {
             List.mapi((index, command:command) => {
-              <button onClick={(_) => dispatch(Click(command.name))} key={string_of_int(index)} className="btn btn-primary">
+              <button onClick={(_) => {
+                resetTimer();
+                dispatch(Click(command.name))
+                }} key={string_of_int(index)} className="btn btn-primary">
               {ReasonReact.string(command.uiName)}
               </button>;
             }, commands) |> Utils.listToReactArray;
