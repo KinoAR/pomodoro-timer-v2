@@ -8,6 +8,7 @@ var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
 var ReactDOMRe = require("reason-react/src/ReactDOMRe.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
+var Utils$ReactHooksTemplate = require("./Utils.bs.js");
 
 function createTask(taskName) {
   return /* record */[
@@ -240,21 +241,20 @@ function Timer(Props) {
       stopTimer(/* () */0);
       Curry._1(dispatch, /* Reset */2);
       if (statusTuple_000 !== 0) {
-        return Curry._1(dispatch, /* Click */Block.__(0, ["pomodoro"]));
+        Curry._1(dispatch, /* Click */Block.__(0, ["pomodoro"]));
       } else if (remainderPomoCount > 0) {
         if (remainderPomoCount >= 3) {
-          return /* () */0;
+          
         } else {
-          return Curry._1(dispatch, /* Click */Block.__(0, ["shortbreak"]));
+          Curry._1(dispatch, /* Click */Block.__(0, ["shortbreak"]));
         }
       } else if (remainderPomoCount >= 0) {
-        return Curry._1(dispatch, /* Click */Block.__(0, ["longbreak"]));
-      } else {
-        return /* () */0;
+        Curry._1(dispatch, /* Click */Block.__(0, ["longbreak"]));
       }
-    } else {
-      return 0;
+      
     }
+    var time = convertTimeToString(state[/* timer */1]);
+    return Utils$ReactHooksTemplate.updateWindowTitle("" + (String(time) + " - NierPixel Pomodoro Timer"));
   };
   handleTimeUpdate(state);
   var match$1 = state[/* title */7];

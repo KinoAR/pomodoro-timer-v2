@@ -166,6 +166,9 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
         | (_, _) => ()
       };
     };
+    let time = convertTimeToString(state.timer);
+    let titleDisplay = {j|$time - NierPixel Pomodoro Timer|j};
+    Utils.updateWindowTitle(titleDisplay);
   };
 
   handleTimeUpdate(state);

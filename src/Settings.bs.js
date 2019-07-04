@@ -162,7 +162,7 @@ function Settings(Props) {
                               className: "btn btn-secondary"
                             }, /* array */["Settings"])))), React.createElement("div", {
                   className: "col-12"
-                }, Curry._3(timerFunc, state[/* pomodoroTime */0], state[/* shortBreakTime */2], state[/* longBreakTime */4])));
+                }, React.createElement("br", undefined), Curry._3(timerFunc, state[/* pomodoroTime */0], state[/* shortBreakTime */2], state[/* longBreakTime */4])));
 }
 
 var make = Settings;

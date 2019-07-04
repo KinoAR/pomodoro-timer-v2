@@ -149,7 +149,9 @@ let make = (~timerFunc) => {
         </div>
       </div>
     </div>
+    
     <div className="col-12">
+        <br/>
         {
           timerFunc(
             ~pomodoro=state.pomodoroTime,
