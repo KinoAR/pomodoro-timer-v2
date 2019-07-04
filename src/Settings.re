@@ -93,7 +93,7 @@ let make = (~timerFunc) => {
                          <div key={string_of_int(index)} className="form-group">
                           <label htmlFor="Time"> {ReasonReact.string(input.name)} </label>
                           <input
-                            className="form-input"
+                            className="form-control"
                             onChange={e => updateSettingsTempTime(input.timeType, e)}
                             type_="text"
                             name="time"

@@ -7,3 +7,4 @@ type document;
 
 
 let updateWindowTitle = (windowTitle) => window |> document |> title(_, windowTitle);
+ let listToReactArray = list => list |> Array.of_list |> ReasonReact.array;

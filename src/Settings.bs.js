@@ -122,7 +122,7 @@ function Settings(Props) {
                                                           }, React.createElement("label", {
                                                                 htmlFor: "Time"
                                                               }, input[/* name */0]), React.createElement("input", {
-                                                                className: "form-input",
+                                                                className: "form-control",
                                                                 name: "time",
                                                                 type: "text",
                                                                 onChange: (function (e) {
