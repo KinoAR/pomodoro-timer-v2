@@ -4,10 +4,19 @@
 var List = require("bs-platform/lib/js/list.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
+var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
+var CamlinternalOO = require("bs-platform/lib/js/camlinternalOO.js");
 var Utils$ReactHooksTemplate = require("./Utils.bs.js");
+var TaskView$ReactHooksTemplate = require("./TaskView.bs.js");
 
 var intervalIdRef = /* record */[/* contents */undefined];
+
+var class_tables = [
+  0,
+  0,
+  0
+];
 
 function Timer(Props) {
   var pomodoro = Props.pomodoro;
@@ -25,7 +34,8 @@ function Timer(Props) {
                             /* initialTime */state[/* initialTime */2],
                             /* pomodoroState */state[/* pomodoroState */3],
                             /* pomodoroCount */state[/* pomodoroCount */4],
-                            /* title */state[/* title */5]
+                            /* intervals */state[/* intervals */5],
+                            /* title */state[/* title */6]
                           ];
                   } else {
                     return state;
@@ -37,7 +47,8 @@ function Timer(Props) {
                           /* initialTime */state[/* initialTime */2],
                           /* pomodoroState */state[/* pomodoroState */3],
                           /* pomodoroCount */state[/* pomodoroCount */4] + 1 | 0,
-                          /* title */state[/* title */5]
+                          /* intervals */state[/* intervals */5],
+                          /* title */state[/* title */6]
                         ];
               case 2 : 
                   return /* record */[
@@ -46,7 +57,8 @@ function Timer(Props) {
                           /* initialTime */state[/* initialTime */2],
                           /* pomodoroState */state[/* pomodoroState */3],
                           /* pomodoroCount */state[/* pomodoroCount */4],
-                          /* title */state[/* title */5]
+                          /* intervals */state[/* intervals */5],
+                          /* title */state[/* title */6]
                         ];
               
             }
@@ -59,7 +71,8 @@ function Timer(Props) {
                           /* initialTime */longBreak,
                           /* pomodoroState : LongBreak */2,
                           /* pomodoroCount */state[/* pomodoroCount */4],
-                          /* title */state[/* title */5]
+                          /* intervals */state[/* intervals */5],
+                          /* title */state[/* title */6]
                         ];
               case "pomodoro" : 
                   return /* record */[
@@ -68,7 +81,8 @@ function Timer(Props) {
                           /* initialTime */pomodoro,
                           /* pomodoroState : Pomodoro */0,
                           /* pomodoroCount */state[/* pomodoroCount */4],
-                          /* title */state[/* title */5]
+                          /* intervals */state[/* intervals */5],
+                          /* title */state[/* title */6]
                         ];
               case "shortbreak" : 
                   return /* record */[
@@ -77,7 +91,8 @@ function Timer(Props) {
                           /* initialTime */shortBreak,
                           /* pomodoroState : ShortBreak */1,
                           /* pomodoroCount */state[/* pomodoroCount */4],
-                          /* title */state[/* title */5]
+                          /* intervals */state[/* intervals */5],
+                          /* title */state[/* title */6]
                         ];
               default:
                 return state;
@@ -89,6 +104,7 @@ function Timer(Props) {
         /* initialTime */300,
         /* pomodoroState : Pomodoro */0,
         /* pomodoroCount */0,
+        /* intervals */3,
         /* title */"Add Task"
       ]);
   var dispatch = match[1];
@@ -171,7 +187,7 @@ function Timer(Props) {
         console.log("Pomodoro Complete");
         Curry._1(dispatch, /* CompletePomodoro */1);
       }
-      var remainderPomoCount = state[/* pomodoroCount */4] / 3 | 0;
+      var remainderPomoCount = Caml_int32.div(state[/* pomodoroCount */4], state[/* intervals */5]);
       var statusTuple_000 = state[/* pomodoroState */3];
       stopTimer(/* () */0);
       Curry._1(dispatch, /* Reset */2);
@@ -190,6 +206,20 @@ function Timer(Props) {
     }
     var time = convertTimeToString(state[/* timer */1]);
     return Utils$ReactHooksTemplate.updateWindowTitle("" + (String(time) + " - NierPixel Pomodoro Timer"));
+  };
+  var updateTask = function (param) {
+    if (!class_tables[0]) {
+      var $$class = CamlinternalOO.create_table(0);
+      var env = CamlinternalOO.new_variable($$class, "");
+      var env_init = function (env$1) {
+        var self = CamlinternalOO.create_object_opt(0, $$class);
+        self[env] = env$1;
+        return self;
+      };
+      CamlinternalOO.init_class($$class);
+      class_tables[0] = env_init;
+    }
+    return Curry._1(class_tables[0], 0);
   };
   handleTimeUpdate(state);
   return React.createElement("div", {
@@ -249,7 +279,15 @@ function Timer(Props) {
                                                     return Curry._1(button[/* fn */2], /* () */0);
                                                   })
                                               }, button[/* name */0]);
-                                  }), timerButtons))))), React.createElement("br", undefined));
+                                  }), timerButtons))))), React.createElement("div", {
+                  className: "col-12"
+                }, React.createElement("div", {
+                      className: "offset-4 col-4"
+                    }, React.createElement("hr", {
+                          className: "standard-style"
+                        })), React.createElement(TaskView$ReactHooksTemplate.make, {
+                      updateTask: updateTask
+                    })));
 }
 
 var make = Timer;

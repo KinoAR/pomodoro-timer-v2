@@ -8,6 +8,7 @@ var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
 var ReactDOMRe = require("reason-react/src/ReactDOMRe.js");
 var Utils$ReactHooksTemplate = require("./Utils.bs.js");
+var TaskRow$ReactHooksTemplate = require("./TaskRow.bs.js");
 
 function addElementToList(list, element) {
   var arr = $$Array.of_list(list);
@@ -20,24 +21,41 @@ function TaskView(Props) {
   var match = React.useReducer((function (state, action) {
           switch (action.tag | 0) {
             case 0 : 
-                return /* record */[
-                        /* title */state[/* title */0],
-                        /* tasks */state[/* tasks */1],
-                        /* currentTaskName */action[0],
-                        /* currentTask */state[/* currentTask */3]
-                      ];
+                var value = action[1];
+                switch (action[0]) {
+                  case "taskDescription" : 
+                      return /* record */[
+                              /* title */state[/* title */0],
+                              /* tasks */state[/* tasks */1],
+                              /* currentTaskName */state[/* currentTaskName */2],
+                              /* currentTaskDescription */value,
+                              /* currentTask */state[/* currentTask */4]
+                            ];
+                  case "taskName" : 
+                      return /* record */[
+                              /* title */state[/* title */0],
+                              /* tasks */state[/* tasks */1],
+                              /* currentTaskName */value,
+                              /* currentTaskDescription */state[/* currentTaskDescription */3],
+                              /* currentTask */state[/* currentTask */4]
+                            ];
+                  default:
+                    return state;
+                }
             case 3 : 
                 return /* record */[
                         /* title */state[/* title */0],
                         /* tasks */addElementToList(state[/* tasks */1], action[0]),
                         /* currentTaskName */state[/* currentTaskName */2],
-                        /* currentTask */state[/* currentTask */3]
+                        /* currentTaskDescription */state[/* currentTaskDescription */3],
+                        /* currentTask */state[/* currentTask */4]
                       ];
             case 4 : 
                 return /* record */[
                         /* title */state[/* title */0],
                         /* tasks */state[/* tasks */1],
                         /* currentTaskName */state[/* currentTaskName */2],
+                        /* currentTaskDescription */state[/* currentTaskDescription */3],
                         /* currentTask */action[0]
                       ];
             case 1 : 
@@ -50,10 +68,30 @@ function TaskView(Props) {
         /* title */"Add Task",
         /* tasks : [] */0,
         /* currentTaskName */"",
+        /* currentTaskDescription */"",
         /* currentTask */undefined
       ]);
   var dispatch = match[1];
   var state = match[0];
+  var updateTaskProps = function ($$event) {
+    $$event.preventDefault();
+    var value = $$event.target.value;
+    var name = $$event.target.name;
+    console.log(name);
+    console.log(value);
+    return Curry._1(dispatch, /* UpdateTaskProp */Block.__(0, [
+                  name,
+                  value
+                ]));
+  };
+  var createTask = function (taskName, taskDescription) {
+    return /* record */[
+            /* name */taskName,
+            /* description */taskDescription,
+            /* pomodoriEstimate */0,
+            /* pomodoriActual */0
+          ];
+  };
   var match$1 = state[/* title */0];
   var tmp = match$1 === "Add Task" ? React.createElement("div", {
           className: "row"
@@ -71,13 +109,16 @@ function TaskView(Props) {
                           name: "taskName",
                           placeholder: "Enter Task Name",
                           type: "text",
-                          onChange: (function (e) {
-                              var $$event = e;
-                              $$event.preventDefault();
-                              var value = $$event.target;
-                              console.log(value);
-                              return /* () */0;
-                            })
+                          onChange: updateTaskProps
+                        })), React.createElement("div", {
+                      className: "form-group"
+                    }, React.createElement("input", {
+                          className: "form-control",
+                          id: "taskDescription",
+                          name: "taskDescription",
+                          placeholder: "Enter Task Description",
+                          type: "text",
+                          onChange: updateTaskProps
                         }))))) : null;
   return React.createElement("div", {
               className: "row"
@@ -107,14 +148,19 @@ function TaskView(Props) {
                               className: "modal-footer"
                             }, React.createElement("div", {
                                   className: "row"
-                                }, React.createElement("br", undefined), React.createElement("div", {
+                                }, React.createElement("br", undefined), ReactDOMRe.createElementVariadic("button", {
+                                      "data-dismiss": "modal",
+                                      type: "button",
+                                      onClick: (function (param) {
+                                          return Curry._1(dispatch, /* ClickAddTask */Block.__(3, [createTask(state[/* currentTaskName */2], state[/* currentTaskDescription */3])]));
+                                        }),
                                       className: "btn btn-primary"
-                                    }, "Add"), ReactDOMRe.createElementVariadic("button", {
+                                    }, /* array */[Utils$ReactHooksTemplate.rStr("Add")]), ReactDOMRe.createElementVariadic("button", {
                                       "data-dismiss": "modal",
                                       type: "button",
                                       className: "btn btn-secondary",
                                       "aria-label": "Close"
-                                    }, /* array */["Close"])))))), React.createElement("div", {
+                                    }, /* array */[Utils$ReactHooksTemplate.rStr("Close")])))))), React.createElement("div", {
                   className: "col-12 text-center"
                 }, React.createElement("h2", undefined, "Task View"), React.createElement("div", {
                       className: "row"
@@ -136,16 +182,14 @@ function TaskView(Props) {
                                               "data-target": "#pomodoroModal",
                                               type: "button",
                                               className: "btn btn-secondary"
-                                            }, /* array */["Add Task"])), Utils$ReactHooksTemplate.listToReactArray(List.mapi((function (index, task) {
-                                                var taskName = task[/* name */0];
-                                                var pomodoriStr = String(task[/* pomodori */1]);
-                                                return React.createElement("li", {
-                                                            key: String(index),
-                                                            className: "list-group-item",
-                                                            onClick: (function (param) {
-                                                                return Curry._1(dispatch, /* ClickTask */Block.__(5, [index]));
-                                                              })
-                                                          }, "" + (String(taskName) + (" : " + (String(pomodoriStr) + ""))));
+                                            }, /* array */[Utils$ReactHooksTemplate.rStr("Add Task")])), Utils$ReactHooksTemplate.listToReactArray(List.mapi((function (index, task) {
+                                                return React.createElement(TaskRow$ReactHooksTemplate.make, {
+                                                            name: task[/* name */0],
+                                                            description: task[/* description */1],
+                                                            estimate: task[/* pomodoriEstimate */2],
+                                                            actual: task[/* pomodoriActual */3],
+                                                            key: String(index)
+                                                          });
                                               }), state[/* tasks */1])))))))));
 }
 

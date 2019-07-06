@@ -1,18 +1,21 @@
 
 type task = {
   name:string,
-  pomodori:int
+  description: string,
+  pomodoriEstimate:int,
+  pomodoriActual: int
 };
 
 type state = {
   title: string,
   tasks: list(task),
   currentTaskName:string,
+  currentTaskDescription:string,
   currentTask:option(task),
 };
 
 type action = 
-| UpdateTaskName(string)
+| UpdateTaskProp(string, string)
 | ClickRemoveTask(task, int)
 | ClickNewTask(string)
 | ClickAddTask(task)
@@ -29,20 +32,29 @@ let addElementToList = (list, element) => {
 let make = (~updateTask) => {
   let (state, dispatch) = React.useReducer((state, action) => {
     switch(action) {
-      | UpdateTaskName(name) => {...state, currentTaskName:name}
+      | UpdateTaskProp(name, value) => switch(name) {
+        | "taskName" => {...state, currentTaskName: value}
+        | "taskDescription" => {...state, currentTaskDescription: value}
+        | _ => state
+      }
       | ClickTask(_) => state
       | ClickAddTask(task) => {...state, tasks: addElementToList(state.tasks, task)}
       | ClickRemoveTask(task, int) => state
       | ClickMakeCurrentTask(task) => {...state, currentTask: Some(task)}
       | _ => state
     }
-  }, {title: "Add Task", currentTaskName:"", tasks: [], currentTask: None});
+  }, {title: "Add Task", currentTaskName:"", currentTaskDescription:"", tasks: [], currentTask: None});
 
-   let updateTaskName = event => {
+   let updateTaskProps = event => {
      ReactEvent.Synthetic.preventDefault(event);
-     let value = ReactEvent.Form.target(event);
+     let value = ReactEvent.Form.target(event)##value;
+     let name = ReactEvent.Form.target(event)##name;
+     Js.log(name)
      Js.log(value);
+     dispatch(UpdateTaskProp(name, value))
    };
+
+   let createTask = (taskName, taskDescription) => {name: taskName, description: taskDescription, pomodoriEstimate: 0, pomodoriActual: 0};
 
 
    <div className="row">
@@ -77,12 +89,22 @@ let make = (~updateTask) => {
                       </label>
                       <input
                         className="form-control"
-                        onChange={e => updateTaskName(e)}
+                        onChange={e => updateTaskProps(e)}
                         type_="text"
                         name="taskName"
                         id="taskName"
                         placeholder="Enter Task Name"
                       />
+                    </div>
+                    <div className="form-group">
+                      <input 
+                        type_="text" 
+                        className="form-control"
+                        name="taskDescription" 
+                        onChange={(e) => updateTaskProps(e) }
+                        id="taskDescription"
+                        placeholder="Enter Task Description"
+                        />
                     </div>
                   </form>
                 </div>
@@ -93,7 +115,17 @@ let make = (~updateTask) => {
          <div className="modal-footer">
            <div className="row">
              <br />
-             <div className="btn btn-primary"> {ReasonReact.string("Add")} </div>
+             {
+               ReactDOMRe.createElementVariadic(
+                 "button",
+                 ~props=ReactDOMRe.objToDOMProps({
+                 "data-dismiss": "modal",
+                 "type": "button",
+                 "onClick": (_) => dispatch(ClickAddTask(createTask(state.currentTaskName, state.currentTaskDescription))) ,
+                 "className": "btn btn-primary"
+               }),
+               [| Utils.rStr("Add") |],               
+              )}
              {ReactDOMRe.createElementVariadic(
                 "button",
                 ~props=
@@ -103,7 +135,7 @@ let make = (~updateTask) => {
                     "className": "btn btn-secondary",
                     "aria-label": "Close",
                   }),
-                [|ReasonReact.string("Close")|],
+                [|Utils.rStr("Close")|],
               )}
            </div>
          </div>
@@ -152,19 +184,24 @@ let make = (~updateTask) => {
                          "type": "button",
                          "className": "btn btn-secondary",
                        }),
-                     [|ReasonReact.string("Add Task")|],
+                     [|Utils.rStr("Add Task")|],
                    )}
                 </li>
                 {List.mapi(
                    (index, task: task) => {
-                     let taskName = task.name;
-                     let pomodoriStr = task.pomodori |> string_of_int;
-                     <li
-                       onClick={_ => dispatch(ClickTask(index))}
-                       key={string_of_int(index)}
-                       className="list-group-item">
-                       {ReasonReact.string({j|$taskName : $pomodoriStr|j})}
-                     </li>;
+                     <TaskRow 
+                      key={index |> string_of_int}
+                      name={task.name}
+                      description={task.description}
+                      estimate={task.pomodoriEstimate}
+                      actual={task.pomodoriActual}
+                     />;
+                    //  <li
+                    //    onClick={_ => dispatch(ClickTask(index))}
+                    //    key={string_of_int(index)}
+                    //    className="list-group-item task-item">
+                    //    {Utils.rStr({j|$taskName : $pomodoriStr|j})}
+                    //  </li>;
                    },
                    state.tasks,
                  )

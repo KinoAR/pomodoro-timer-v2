@@ -10,6 +10,7 @@ type state = {
   initialTime:int,
   pomodoroState: pomodoroState,
   pomodoroCount: int,
+  intervals: int,
   title:string,
 };
 
@@ -55,7 +56,7 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
     } 
     | Reset => {...state, timer: state.initialTime}
     | CompletePomodoro => {...state, pomodoroCount: state.pomodoroCount + 1}
-  }, {running:false, title:"Add Task", pomodoroCount: 0,  timer:300, initialTime: 300, pomodoroState: Pomodoro})
+  }, {running:false, title:"Add Task", pomodoroCount: 0, intervals:3,  timer:300, initialTime: 300, pomodoroState: Pomodoro});
   
   
   let stopTimer = () => {
@@ -128,7 +129,7 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
         Js.log("Pomodoro Complete")
         dispatch(CompletePomodoro);
       };
-      let remainderPomoCount = state.pomodoroCount / 3;
+      let remainderPomoCount = state.pomodoroCount / state.intervals;
       let statusTuple = (state.pomodoroState, remainderPomoCount);
       resetTimer()
       switch(statusTuple) {
@@ -143,6 +144,10 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
     let time = convertTimeToString(state.timer);
     let titleDisplay = {j|$time - NierPixel Pomodoro Timer|j};
     Utils.updateWindowTitle(titleDisplay);
+  };
+
+  let updateTask = () => {
+
   };
 
 
@@ -186,6 +191,12 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
           </div>
         </div>
     </div>
-    <br/>
+    <div className="col-12">
+      <div className="offset-4 col-4">
+         <hr className="standard-style" />
+      </div>
+      // Task View 
+    <TaskView updateTask={updateTask} />
+    </div>
   </div>
 };

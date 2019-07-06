@@ -11,6 +11,11 @@ function updateWindowTitle(windowTitle) {
 
 var listToReactArray = $$Array.of_list;
 
+function rStr(string) {
+  return string;
+}
+
 exports.updateWindowTitle = updateWindowTitle;
 exports.listToReactArray = listToReactArray;
+exports.rStr = rStr;
 /* No side effect */
