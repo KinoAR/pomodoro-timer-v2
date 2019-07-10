@@ -15,7 +15,27 @@ function rStr(string) {
   return string;
 }
 
+function logErrorResolve(err) {
+  return Promise.resolve((console.log("Error: ", err), /* () */0));
+}
+
+function nullableToString(string) {
+  if (string == null) {
+    return "";
+  } else {
+    return string;
+  }
+}
+
+function spaceForWeb(str) {
+  var re = new RegExp("\\s", "ig");
+  return str.replace(re, "%20");
+}
+
 exports.updateWindowTitle = updateWindowTitle;
 exports.listToReactArray = listToReactArray;
 exports.rStr = rStr;
+exports.logErrorResolve = logErrorResolve;
+exports.nullableToString = nullableToString;
+exports.spaceForWeb = spaceForWeb;
 /* No side effect */
