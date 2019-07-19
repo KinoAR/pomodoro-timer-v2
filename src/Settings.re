@@ -95,6 +95,7 @@ let make = (~timerFunc) => {
                           <input
                             className="form-control"
                             onChange={e => updateSettingsTempTime(input.timeType, e)}
+                            defaultValue={(getTimeByTimeType(input.timeType)  / 60) |> string_of_int}
                             type_="text"
                             name="time"
                             // value={input.timeType |> getTimeByTimeType |> convertSecondsToMinutes |>string_of_int}

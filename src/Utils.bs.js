@@ -32,10 +32,13 @@ function spaceForWeb(str) {
   return str.replace(re, "%20");
 }
 
+var resolveEmpty = Promise.resolve(undefined);
+
 exports.updateWindowTitle = updateWindowTitle;
 exports.listToReactArray = listToReactArray;
 exports.rStr = rStr;
 exports.logErrorResolve = logErrorResolve;
 exports.nullableToString = nullableToString;
 exports.spaceForWeb = spaceForWeb;
-/* No side effect */
+exports.resolveEmpty = resolveEmpty;
+/* resolveEmpty Not a pure module */

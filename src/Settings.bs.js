@@ -83,6 +83,17 @@ function Settings(Props) {
       /* timeType : LongBreak */2
     ]
   ];
+  var getTimeByTimeType = function (timeType) {
+    switch (timeType) {
+      case 0 : 
+          return state[/* pomodoroTime */0];
+      case 1 : 
+          return state[/* shortBreakTime */2];
+      case 2 : 
+          return state[/* longBreakTime */4];
+      
+    }
+  };
   return React.createElement("div", {
               className: "row"
             }, React.createElement("div", {
@@ -122,6 +133,7 @@ function Settings(Props) {
                                                           }, React.createElement("label", {
                                                                 htmlFor: "Time"
                                                               }, input[/* name */0]), React.createElement("input", {
+                                                                defaultValue: String(getTimeByTimeType(input[/* timeType */2]) / 60 | 0),
                                                                 className: "form-control",
                                                                 name: "time",
                                                                 type: "text",
