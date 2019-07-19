@@ -22,3 +22,6 @@ small.pomodoro-state {
 div.modal {
   color: black !important;
 }
+li.task-item {
+  color: black !important;
+}

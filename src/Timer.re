@@ -3,28 +3,21 @@ type pomodoroState =
 | ShortBreak
 | LongBreak;
 
-type task = {
-  name: string,
-  pomodori: int,
-};
 
 type state = {
   running:bool,
   timer:int,
   initialTime:int,
   pomodoroState: pomodoroState,
-  currentTask:task,
-  taskNameInput:string,
+  pomodoroCount: int,
+  intervals: int,
   title:string,
-  tasks: list(task)
 };
 
 type action = 
 | Click(string)
-| ClickTask(int)
-| ClickNewTask(string)
-| UpdateTaskName(string)
 | Tick
+| CompletePomodoro
 | Reset;
 
 type command = {
@@ -38,42 +31,34 @@ type timerButton = {
   fn: unit => unit
 };
 
-let createTask  = (taskName) => {
-  {name:taskName, pomodori:0};
-}
-
 
 //Has to be outside of the component to prevent it 
 //from being reinitialized on rerender
 let intervalIdRef = ref(None);
 
+//Everything within this function gets updated on rerender
 [@react.component]
-let make = () => {
+let make = (~pomodoro, ~shortBreak, ~longBreak) => {
   let (state, dispatch) = React.useReducer((state, action) => 
   switch(action) {
     | Click(actionName) => switch(actionName) {
-     | "pomodoro" => {...state, pomodoroState: Pomodoro, timer: 1500, initialTime: 1500}
-     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: 300, initialTime: 900}
-     | "longbreak" => {...state, pomodoroState: LongBreak, timer: 900, initialTime: 900}
+     | "pomodoro" => {...state, pomodoroState: Pomodoro, timer: pomodoro, initialTime: pomodoro}
+     | "shortbreak" => {...state, pomodoroState: ShortBreak, timer: shortBreak, initialTime: shortBreak}
+     | "longbreak" => {...state, pomodoroState: LongBreak, timer: longBreak, initialTime: longBreak}
      | _ => state
     }
-    | ClickTask(taskIndex) => {...state, currentTask: List.nth(state.tasks, taskIndex)}
-    | Tick => {...state, timer: state.timer  - 1}
+    | Tick => {
+      switch(state.timer) {
+        | 0 => state
+        | _ => {...state, timer: state.timer - 1}
+      };
+      // state.timer > 0 ? {...state, timer: state.timer - 1} : state;
+    } 
     | Reset => {...state, timer: state.initialTime}
-    | UpdateTaskName(taskName) => {...state, taskNameInput: taskName}
-    | _ => state
-  }, {running:false, title:"Add Task", taskNameInput: "", timer:300, initialTime: 300, pomodoroState: Pomodoro, tasks: [], currentTask:{name:"", pomodori:0}})
+    | CompletePomodoro => {...state, pomodoroCount: state.pomodoroCount + 1}
+  }, {running:false, title:"Add Task", pomodoroCount: 0, intervals:3,  timer:300, initialTime: 300, pomodoroState: Pomodoro});
   
-  let startTimer = () => {
-    switch(intervalIdRef^) {
-      | Some(_) => ()
-      | None => {
-        let intervalId = Js.Global.setInterval(() => dispatch(Tick), 1000);
-        intervalIdRef := Some(intervalId);
-      }
-    };
-  };
-
+  
   let stopTimer = () => {
     switch(intervalIdRef^) {
       | Some(intervalID) => {
@@ -88,6 +73,25 @@ let make = () => {
     stopTimer();
     dispatch(Reset);
   }
+
+  let startTimer = () => {
+    switch (intervalIdRef^) {
+    | Some(_) => ()
+    | None =>
+      let intervalId =
+        Js.Global.setInterval(
+          () => {
+            //State not updated here, because the function is run once on click
+            //This function would only get a new state when you click, but is recreated
+            // on rerender
+            dispatch(Tick);
+          },
+          1000,
+        );
+      intervalIdRef := Some(intervalId);
+    };
+  };
+
 
   let commands = [
     {name:"pomodoro", uiName: "Pomodoro"},
@@ -115,91 +119,54 @@ let make = () => {
     let strSeconds = seconds |> string_of_int;
     let strMinutes = minutes |> string_of_int;
     let displayMinutes = String.length(strMinutes) < 2 ? "0" ++ strMinutes : strMinutes;
-    let displaySeconds = String.length(strSeconds) < 2 ? strSeconds ++ "0" : strSeconds;
+    let displaySeconds = String.length(strSeconds) < 2 ? "0" ++ strSeconds : strSeconds;
     {j|$displayMinutes:$displaySeconds|j};
-  }
+  };
+  
+  let handleTimeUpdate = (state) => {
+    if (state.timer == 0) {
+      if(state.pomodoroState == Pomodoro) {
+        Js.log("Pomodoro Complete")
+        dispatch(CompletePomodoro);
+      };
+      let remainderPomoCount = state.pomodoroCount / state.intervals;
+      let statusTuple = (state.pomodoroState, remainderPomoCount);
+      resetTimer()
+      switch(statusTuple) {
+        | (Pomodoro, 1) => dispatch(Click("shortbreak"))
+        | (Pomodoro, 2) => dispatch(Click("shortbreak"))
+        | (Pomodoro, 0) => dispatch(Click("longbreak"))
+        | (ShortBreak, _) => dispatch(Click("pomodoro"))
+        | (LongBreak, _) => dispatch(Click("pomodoro"))
+        | (_, _) => ()
+      };
+    };
+    let time = convertTimeToString(state.timer);
+    let titleDisplay = {j|$time - NierPixel Pomodoro Timer|j};
+    Utils.updateWindowTitle(titleDisplay);
+  };
 
-  let updateTaskName = (event) => {
-    ReactEvent.Synthetic.preventDefault(event);
-    let value = ReactEvent.Form.target(event);
-    Js.log(value);
-  }
+  let updateTask = () => {
 
-  let tasks = state.tasks;
-  let listToReactArray = (list) => list |> Array.of_list |> ReasonReact.array;
-  //Modal Area of the application
+  };
+
+
+  handleTimeUpdate(state);
+  /* Modal Area of the application */
   <div className="row">
-    <div className="modal fade" id="pomodoroModal" role="dialog">
-     <div className="modal-dialog" role="document">
-      <div className="modal-content">
-        <div className="modal-header">
-          <div className="modal-title">
-            {ReasonReact.string(state.title)}
-          </div>
-          {ReactDOMRe.createElementVariadic(
-            "button",
-            ~props=(ReactDOMRe.objToDOMProps({
-              "data-dismiss": "modal",
-              "type": "button",
-              "className": "close",
-              "aria-label": "Close"
-              })),
-            [|
-              (<span ariaHidden={true}>{ReasonReact.string("Close")}</span>)
-            |]
-          )}
-          </div>
-          <div className="modal-body">
-          {
-            switch(state.title) {
-              | "Add Task" => {
-                <div className="row">
-                  <div className="col-12">
-                    <form action="">
-                      <div className="form-group">
-                        <label htmlFor="Task Name">{ReasonReact.string("Task Name")}</label>
-                        <input onChange={(e) => updateTaskName(e)} type_="text" name="taskName" id="taskName" placeholder="Enter Task Name"/>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              }
-              | _ => ReasonReact.null
-            }
-          }
-          </div>
-          <div className="modal-footer">
-          <div className="row">
-          <br/>
-          <div className="btn btn-primary"> {ReasonReact.string("Save Changes")} </div>(
-            {
-              ReactDOMRe.createElementVariadic(
-                "button",
-                ~props=
-                  ReactDOMRe.objToDOMProps({
-                    "data-dismiss": "modal",
-                    "type": "button",
-                    "className": "btn btn-secondary",
-                    "aria-label": "Close",
-                  }),
-                [|ReasonReact.string("Close")|],
-              );
-            },
-          )
-          </div>
-        </div>
-      </div>
-     </div>
-    </div>
+    
     <div className="offset-4 col-4">
         <div className="col-12 text-center">
           <div className="btn-group">
           {
             List.mapi((index, command:command) => {
-              <button onClick={(_) => dispatch(Click(command.name))} key={string_of_int(index)} className="btn btn-primary">
+              <button onClick={(_) => {
+                resetTimer();
+                dispatch(Click(command.name))
+                }} key={string_of_int(index)} className="btn btn-primary">
               {ReasonReact.string(command.uiName)}
               </button>;
-            }, commands) |> listToReactArray;
+            }, commands) |> Utils.listToReactArray;
           }
           </div>
         </div>
@@ -219,72 +186,17 @@ let make = () => {
                 <button onClick={(_) => button.fn()}  key={string_of_int(index)} className={j|btn $className|j}>
                 {ReasonReact.string(button.name)}
                 </button>
-              }, timerButtons) |> listToReactArray;
+              }, timerButtons) |> Utils.listToReactArray;
             }
           </div>
         </div>
     </div>
-    <br/>
-    <div className="col-12 text-center">
-      <h2> {ReasonReact.string("Task View")}</h2>
-      <div className="row">
-        <div className="col-12">
-        {
-          String.length(state.currentTask.name) > 0 ?
-          (<div>
-            <h4> {ReasonReact.string("Current Task")} </h4>
-            <div className="row text-center">
-              <div className="offset-4 col-4 text-center">
-                <div className="card">
-                  <div className="card-body">
-                    <h5 className="card-title">
-                      {ReasonReact.string(state.currentTask.name)}
-                    </h5>
-                    <a href="" className="btn btn-outline-primary">
-                      {ReasonReact.string("Done")}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>) : ReasonReact.null
-        } 
-        </div>
-        <div className="col-12 task-area">
-          <h4> {ReasonReact.string("Tasks")} </h4>
-          <div className="row">
-            <div className="col-12">
-              <ul className="list-group">
-                <li onClick={(_) => () } className="list-group-item task-area">
-                  {ReasonReact.string("Add a new task")}
-                  {
-                    ReactDOMRe.createElementVariadic(
-                      "button",
-                      ~props=
-                        ReactDOMRe.objToDOMProps({
-                          "data-toggle": "modal",
-                          "data-target": "#pomodoroModal",
-                          "type": "button",
-                          "className": "btn btn-secondary",
-                        }),
-                      [|ReasonReact.string("Add Task")|],
-                    );
-                  }
-                </li>
-                {
-                  List.mapi((index, task:task) => {
-                    let taskName = task.name;
-                    let pomodoriStr = task.pomodori |> string_of_int;
-                    <li onClick={(_) => dispatch(ClickTask(index))} key={string_of_int(index)} className="list-group-item">
-                      {ReasonReact.string({j|$taskName : $pomodoriStr|j})}
-                    </li>;
-                  }, tasks) |> listToReactArray;
-                }
-              </ul>
-            </div>
-          </div>
-        </div>
+    <div className="col-12">
+      <div className="offset-4 col-4">
+         <hr className="standard-style" />
       </div>
+      // Task View 
+    <TaskView updateTask={updateTask} />
     </div>
   </div>
 };
