@@ -39,6 +39,16 @@ let intervalIdRef = ref(None);
 //Everything within this function gets updated on rerender
 [@react.component]
 let make = (~pomodoro, ~shortBreak, ~longBreak) => {
+
+  let changeTimerStateByCount = (pomodoroState, count) =>
+    switch (pomodoroState, count) {
+    | (Pomodoro, 1) => shortBreak
+    | (Pomodoro, 2) => shortBreak
+    | (Pomodoro, 0) => longBreak
+    | (ShortBreak, _) => pomodoro
+    | (LongBreak, _) => pomodoro
+    | (_, _) => pomodoro
+    };
   let (state, dispatch) = React.useReducer((state, action) => 
   switch(action) {
     | Click(actionName) => switch(actionName) {
@@ -55,7 +65,12 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
       // state.timer > 0 ? {...state, timer: state.timer - 1} : state;
     } 
     | Reset => {...state, timer: state.initialTime}
-    | CompletePomodoro => {...state, pomodoroCount: state.pomodoroCount + 1}
+    | CompletePomodoro => {
+      ...state, 
+      pomodoroCount: state.pomodoroCount + 1, 
+      timer: changeTimerStateByCount(state.pomodoroState, (state.pomodoroCount + 1) mod state.intervals), 
+      initialTime: changeTimerStateByCount(state.pomodoroState, (state.pomodoroCount + 1) mod state.intervals)
+    }
   }, {running:false, title:"Add Task", pomodoroCount: 0, intervals:3,  timer:300, initialTime: 300, pomodoroState: Pomodoro});
   
   
@@ -122,6 +137,8 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
     let displaySeconds = String.length(strSeconds) < 2 ? "0" ++ strSeconds : strSeconds;
     {j|$displayMinutes:$displaySeconds|j};
   };
+
+  
   
   let handleTimeUpdate = (state) => {
     if (state.timer == 0) {
@@ -129,22 +146,14 @@ let make = (~pomodoro, ~shortBreak, ~longBreak) => {
         Js.log("Pomodoro Complete")
         dispatch(CompletePomodoro);
       };
-      let remainderPomoCount = state.pomodoroCount / state.intervals;
-      let statusTuple = (state.pomodoroState, remainderPomoCount);
       resetTimer()
-      switch(statusTuple) {
-        | (Pomodoro, 1) => dispatch(Click("shortbreak"))
-        | (Pomodoro, 2) => dispatch(Click("shortbreak"))
-        | (Pomodoro, 0) => dispatch(Click("longbreak"))
-        | (ShortBreak, _) => dispatch(Click("pomodoro"))
-        | (LongBreak, _) => dispatch(Click("pomodoro"))
-        | (_, _) => ()
-      };
     };
     let time = convertTimeToString(state.timer);
     let titleDisplay = {j|$time - NierPixel Pomodoro Timer|j};
     Utils.updateWindowTitle(titleDisplay);
   };
+
+
 
   let updateTask = () => {
 
