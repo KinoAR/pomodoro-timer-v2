@@ -22,6 +22,21 @@ function Timer(Props) {
   var pomodoro = Props.pomodoro;
   var shortBreak = Props.shortBreak;
   var longBreak = Props.longBreak;
+  var changeTimerStateByCount = function (pomodoroState, count) {
+    if (pomodoroState !== 0) {
+      return pomodoro;
+    } else if (count > 0) {
+      if (count >= 3) {
+        return pomodoro;
+      } else {
+        return shortBreak;
+      }
+    } else if (count >= 0) {
+      return longBreak;
+    } else {
+      return pomodoro;
+    }
+  };
   var match = React.useReducer((function (state, action) {
           if (typeof action === "number") {
             switch (action) {
@@ -43,8 +58,8 @@ function Timer(Props) {
               case 1 : 
                   return /* record */[
                           /* running */state[/* running */0],
-                          /* timer */state[/* timer */1],
-                          /* initialTime */state[/* initialTime */2],
+                          /* timer */changeTimerStateByCount(state[/* pomodoroState */3], Caml_int32.mod_(state[/* pomodoroCount */4] + 1 | 0, state[/* intervals */5])),
+                          /* initialTime */changeTimerStateByCount(state[/* pomodoroState */3], Caml_int32.mod_(state[/* pomodoroCount */4] + 1 | 0, state[/* intervals */5])),
                           /* pomodoroState */state[/* pomodoroState */3],
                           /* pomodoroCount */state[/* pomodoroCount */4] + 1 | 0,
                           /* intervals */state[/* intervals */5],
@@ -187,22 +202,8 @@ function Timer(Props) {
         console.log("Pomodoro Complete");
         Curry._1(dispatch, /* CompletePomodoro */1);
       }
-      var remainderPomoCount = Caml_int32.div(state[/* pomodoroCount */4], state[/* intervals */5]);
-      var statusTuple_000 = state[/* pomodoroState */3];
       stopTimer(/* () */0);
       Curry._1(dispatch, /* Reset */2);
-      if (statusTuple_000 !== 0) {
-        Curry._1(dispatch, /* Click */["pomodoro"]);
-      } else if (remainderPomoCount > 0) {
-        if (remainderPomoCount >= 3) {
-          
-        } else {
-          Curry._1(dispatch, /* Click */["shortbreak"]);
-        }
-      } else if (remainderPomoCount >= 0) {
-        Curry._1(dispatch, /* Click */["longbreak"]);
-      }
-      
     }
     var time = convertTimeToString(state[/* timer */1]);
     return Utils$ReactHooksTemplate.updateWindowTitle("" + (String(time) + " - NierPixel Pomodoro Timer"));
